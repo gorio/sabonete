@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7faf6">
+  <title>Calculadora de Sabonete Vegetal | Base Glicerinada</title>
+  <meta name="description" content="Calcule rapidamente base vegetal, essência, extrato glicólico e lauril para sabonetes glicerinados em barra. Calcule a partir da base ou do peso final estimado.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://gorio.github.io/sabonete/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Calculadora de Sabonete Vegetal">
+  <meta property="og:description" content="Uma calculadora simples para suas receitas de sabonete vegetal: base em gramas e aditivos em mL.">
+  <meta property="og:url" content="https://gorio.github.io/sabonete/">
+  <meta name="color-scheme" content="light">
+  <style>
+    :root { color-scheme:light; --bg:#f6f8f5; --white:#fff; --ink:#192e24; --muted:#5c7062; --accent:#2b684b; --stroke:#dae6dc; --light:#edf5ef; }
+    * { box-sizing:border-box; }
+    body { background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; margin:0; }
+    main { width:min(100% - 32px,540px); margin:38px auto 50px; }
+    .eyebrow { font-size:12px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.09em; }
+    h1 { margin:9px 0 10px; font-size:clamp(29px,6vw,38px); line-height:1.12; letter-spacing:-.04em; }
+    .intro { color:var(--muted); margin:0 0 22px; line-height:1.55; font-size:15px; }
+    .card { background:var(--white); border:1px solid var(--stroke); border-radius:20px; padding:25px; box-shadow:0 9px 35px #1b3b260a; }
+    .tabs { display:grid; grid-template-columns:1fr 1fr; gap:5px; padding:5px; border-radius:12px; background:#edf2ec; }
+    .tabs button { appearance:none; background:transparent; border:0; border-radius:9px; font:650 14px system-ui; color:#52665a; padding:13px 4px; cursor:pointer; }
+    .tabs button.active { background:var(--white); color:var(--accent); box-shadow:0 2px 8px #183a231c; }
+    button:focus-visible, input:focus-visible { outline:3px solid #88bb9b; outline-offset:2px; }
+    label { display:block; margin:22px 0 9px; font-size:14px; font-weight:750; }
+    .weightbox { display:flex; align-items:center; padding:0 17px; border:2px solid #c5d9cb; border-radius:12px; }
+    .weightbox:focus-within { border-color:var(--accent); }
+    input { width:100%; min-width:0; border:0; outline:0; background:transparent; padding:11px 0; font-size:34px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums; }
+    input:focus-visible { outline:none; }
+    .unit { color:var(--muted); font-size:20px; font-weight:750; }
+    .recipe { color:var(--muted); font-size:13px; line-height:1.5; margin:12px 0 0; }
+    .err { color:#a13a32; font-size:13px; font-weight:650; margin:8px 0 0; }
+    .divider { border:0; border-top:1px solid var(--stroke); margin:24px 0 17px; }
+    h2 { font-size:18px; letter-spacing:-.02em; margin:0 0 10px; }
+    table { width:100%; border-collapse:collapse; }
+    td { padding:13px 0; border-bottom:1px solid #edf1ed; font-size:15px; }
+    td:last-child { text-align:right; font-variant-numeric:tabular-nums; font-weight:760; white-space:nowrap; }
+    small { color:var(--muted); font-size:12px; font-weight:450; }
+    .result { margin:20px 0 0; padding:17px; border-radius:12px; background:var(--light); }
+    .result span { display:block; font-size:12px; color:var(--muted); font-weight:700; }
+    .result strong { display:block; font-size:26px; margin:3px 0; color:var(--accent); font-variant-numeric:tabular-nums; }
+    .result p { margin:4px 0 0; font-size:12px; line-height:1.5; color:var(--muted); }
+    .note, footer { font-size:12px; line-height:1.65; color:var(--muted); }
+    .note { margin:19px 0 0; }
+    footer { margin:18px 2px; }
+    @media(max-width:530px) { main { margin:22px auto 35px; } .card { padding:18px; border-radius:17px; } .tabs button { font-size:13px; } }
+    @media print { body { background:white; } .card { box-shadow:none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Sabonete vegetal</div>
+    <h1>Calculadora simples</h1>
+    <p class="intro">Informe o peso da base ou o peso desejado do sabonete. Veja quanto usar de cada ingrediente na sua proporção atual.</p>
+    <section class="card" aria-label="Cálculo de ingredientes">
+      <div class="tabs" role="group" aria-label="Escolha o tipo de cálculo">
+        <button type="button" class="active" id="tabBase" aria-pressed="true">Tenho a base</button>
+        <button type="button" id="tabFinal" aria-pressed="false">Quero peso final</button>
+      </div>
+      <label for="weight" id="weightLabel">Quantos gramas de base vegetal você tem?</label>
+      <div class="weightbox">
+        <input id="weight" type="text" inputmode="decimal" value="150" autocomplete="off" aria-describedby="formula">
+        <span class="unit">g</span>
+      </div>
+      <p class="recipe" id="formula">Proporção: a cada 100 g de base, 8 mL de essência, 7 mL de extrato e 10 mL de lauril.</p>
+      <p class="err" id="error" role="alert"></p>
+      <hr class="divider">
+      <h2>Ingredientes</h2>
+      <table aria-label="Quantidades calculadas">
+        <tbody>
+          <tr><td>Base vegetal</td><td id="base">150,00 g</td></tr>
+          <tr><td>Essência <small>(8 mL/100 g)</small></td><td id="essencia">12,00 mL</td></tr>
+          <tr><td>Extrato glicólico <small>(7 mL/100 g)</small></td><td id="extrato">10,50 mL</td></tr>
+          <tr><td>Lauril <small>(10 mL/100 g)</small></td><td id="lauril">15,00 mL</td></tr>
+        </tbody>
+      </table>
+      <div class="result" aria-live="polite">
+        <span id="finalLabel">Peso final estimado</span>
+        <strong id="total">187,50 g</strong>
+        <p id="estimate">Estimativa usando 1 g por mL para cada aditivo. O peso real pode ser diferente.</p>
+      </div>
+      <p class="note" id="explain">Os volumes acima reproduzem sua forma de medir os ingredientes. Eles não representam percentuais em massa.</p>
+    </section>
+    <footer><strong>Atenção:</strong> os valores apenas reproduzem matematicamente a receita informada. A fórmula não foi validada para uso na pele: confirme o limite da essência (IFRA categoria 9), a ficha técnica da base e o tipo/concentração do lauril. São muitos aditivos para uma base pronta, e a compatibilidade precisa ser verificada.</footer>
+  </main>
+  <script>
+    'use strict';
+    (() => {
+      const $ = id => document.getElementById(id);
+      const fmt = new Intl.NumberFormat('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+      const rates = Object.freeze({essencia: .08, extrato: .07, lauril: .10});
+      const multiplier = 1 + rates.essencia + rates.extrato + rates.lauril;
+      let mode = 'base';
+      function parseBrazilNumber(raw) {
+        const input = String(raw).trim().replace(/\s+/g, '');
+        if (!/^\d+(?:[.,]\d+)?$/.test(input)) return NaN;
+        return Number(input.replace(',', '.'));
+      }
+      function fmtMeasure(value, unit) { return Number.isFinite(value) ? `${fmt.format(value)} ${unit}` : '—'; }
+      function update() {
+        const amount = parseBrazilNumber($('weight').value);
+        const ok = Number.isFinite(amount) && amount > 0 && amount <= 1e9;
+        $('error').textContent = ok ? '' : 'Informe um peso maior que zero.';
+        const base = ok ? (mode === 'base' ? amount : amount / multiplier) : NaN;
+        $('base').textContent = fmtMeasure(base, 'g');
+        for (const [ingredient, rate] of Object.entries(rates)) {
+          $(ingredient).textContent = fmtMeasure(base * rate, 'mL');
+        }
+        $('total').textContent = fmtMeasure(base * multiplier, 'g');
+        $('finalLabel').textContent = mode === 'final' ? 'Peso final desejado (estimativa)' : 'Peso final estimado';
+        $('estimate').textContent = mode === 'final'
+          ? 'Para chegar a esse peso, usamos provisoriamente 1 g/mL. O peso final real depende da densidade dos líquidos.'
+          : 'Estimativa usando 1 g/mL para cada líquido. O peso final real depende da densidade dos líquidos.';
+      }
+      function changeMode(next) {
+        mode = next;
+        $('tabBase').classList.toggle('active', mode === 'base');
+        $('tabFinal').classList.toggle('active', mode === 'final');
+        $('tabBase').setAttribute('aria-pressed', String(mode === 'base'));
+        $('tabFinal').setAttribute('aria-pressed', String(mode === 'final'));
+        $('weightLabel').textContent = mode === 'base'
+          ? 'Quantos gramas de base vegetal você tem?'
+          : 'Quantos gramas deve pesar o sabonete pronto?';
+        update();
+      }
+      $('tabBase').addEventListener('click', () => changeMode('base'));
+      $('tabFinal').addEventListener('click', () => changeMode('final'));
+      $('weight').addEventListener('input', update);
+      update();
+    })();
+  </script>
+</body>
+</html>
