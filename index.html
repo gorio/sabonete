@@ -48,6 +48,28 @@
     .note, footer { font-size:12px; line-height:1.65; color:var(--muted); }
     .note { margin:19px 0 0; }
     footer { margin:18px 2px; }
+
+    /* Guia de temperatura: referências vinculadas a bases específicas */
+    .temp-section { margin-top:18px; }
+    .temp-head { margin-bottom:16px; }
+    .temp-head h2 { margin:0 0 7px; font-size:22px; }
+    .temp-head p { margin:0; color:var(--muted); line-height:1.55; font-size:14px; }
+    .temp-source { background:#f3f7f1; border:1px solid #d4e2d3; padding:12px 14px; border-radius:12px; font-size:13px; color:#355a46; line-height:1.55; margin-bottom:16px; }
+    .temp-steps { list-style:none; padding:0; margin:0; }
+    .temp-step { display:grid; grid-template-columns:28px minmax(0,1fr); gap:12px; padding:15px 0; border-bottom:1px solid #edf1ed; }
+    .temp-step:last-child { border-bottom:0; padding-bottom:5px; }
+    .step-n { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; color:var(--accent); background:var(--light); font-size:13px; font-weight:800; }
+    .step-top { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 12px; }
+    .step-top strong { font-size:15px; }
+    .temp-value { font-weight:800; font-size:16px; color:var(--accent); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .temp-step p { margin:6px 0 0; color:var(--muted); line-height:1.5; font-size:13px; }
+    .temp-caution { margin:16px 0 0; padding:14px; border-radius:12px; border:1px solid #ecd6b7; background:#fffbf4; font-size:13px; line-height:1.55; color:#674f2f; }
+    .temp-refs { margin-top:16px; border-top:1px solid var(--stroke); padding-top:13px; font-size:13px; line-height:1.55; }
+    .temp-refs summary { cursor:pointer; font-weight:750; color:var(--accent); }
+    .temp-refs p { color:var(--muted); }
+    .temp-refs ul { margin:10px 0 0; padding-left:20px; }
+    .temp-refs li { padding:4px 0; }
+    .temp-refs a { color:var(--accent); text-underline-offset:2px; }
     @media(max-width:530px) { main { margin:22px auto 35px; } .card { padding:18px; border-radius:17px; } .tabs button { font-size:13px; } }
     @media print { body { background:white; } .card { box-shadow:none; } }
   </style>
@@ -85,6 +107,47 @@
         <p id="estimate">Estimativa usando 1 g por mL para cada aditivo. O peso real pode ser diferente.</p>
       </div>
       <p class="note" id="explain">Os volumes acima reproduzem sua forma de medir os ingredientes. Eles não representam percentuais em massa.</p>
+    </section>
+
+    <section class="card temp-section" id="temperaturas" aria-labelledby="titulo-temperaturas">
+      <div class="temp-head">
+        <h2 id="titulo-temperaturas">Temperaturas de preparo</h2>
+        <p>Guia rápido para derreter a base e adicionar os ingredientes, com termômetro.</p>
+      </div>
+      <div class="temp-source"><strong>Referência ilustrativa: base vegetal Limne.</strong> Sua marca ainda não foi informada. As temperaturas abaixo não são limites universais: siga a ficha técnica da base que você realmente utiliza.</div>
+      <ol class="temp-steps">
+        <li class="temp-step">
+          <span class="step-n" aria-hidden="true">1</span>
+          <div><div class="step-top"><strong>Derreter a base vegetal</strong><span class="temp-value">60–70 °C</span></div><p>Faixa indicada pela Limne para sua base vegetal. Corte em cubos, aqueça suavemente em banho-maria e mexa. Não deixe ferver. <strong>70 °C é o topo desta faixa recomendada, não um máximo universal.</strong></p></div>
+        </li>
+        <li class="temp-step">
+          <span class="step-n" aria-hidden="true">2</span>
+          <div><div class="step-top"><strong>Resfriar antes dos ativos</strong><span class="temp-value">≈ 55 °C</span></div><p>Retire do aquecimento e confira com termômetro a temperatura da própria base líquida.</p></div>
+        </li>
+        <li class="temp-step">
+          <span class="step-n" aria-hidden="true">3</span>
+          <div><div class="step-top"><strong>Essência, extrato e lauril</strong><span class="temp-value">≈ 55 °C</span></div><p>Referência de adição para essência e demais ativos na Limne, e para essência, extrato glicólico e lauril líquido em receita de fornecedor. Incorpore delicadamente, <strong>somente se cada produto for compatível e autorizado</strong> pela base e por seu próprio fabricante.</p></div>
+        </li>
+        <li class="temp-step">
+          <span class="step-n" aria-hidden="true">4</span>
+          <div><div class="step-top"><strong>Despejar nos moldes</strong><span class="temp-value">Ainda líquida</span></div><p>Molde após homogeneizar, antes que a mistura comece a solidificar. Não há temperatura única de moldagem para todas as bases.</p></div>
+        </li>
+        <li class="temp-step">
+          <span class="step-n" aria-hidden="true">5</span>
+          <div><div class="step-top"><strong>Resfriar e desenformar</strong><span class="temp-value">Ambiente</span></div><p>Aguarde o sabonete ficar completamente firme. Tempo e temperatura exatos dependem da base, do molde e das condições do local.</p></div>
+        </li>
+      </ol>
+      <p class="temp-caution"><strong>Antes de fabricar:</strong> sua receita 8 mL de essência + 7 mL de extrato + 10 mL de lauril por 100 g de base é uma proporção informada, não uma fórmula tecnicamente validada. Verifique o limite de aditivos da base, o certificado IFRA categoria 9 da essência e o tipo e teor ativo do lauril. As temperaturas não validam essa dosagem.</p>
+      <details class="temp-refs">
+        <summary>Outras bases e fontes das temperaturas</summary>
+        <p>As referências diferem bastante. Não misture a temperatura máxima de uma base com a indicação de aditivos de outra.</p>
+        <ul>
+          <li><strong>Limne vegetal:</strong> aquecimento ideal 60–70 °C; adicionar essência e ativos a 55 °C. <a href="https://www.limne.com.br/base-glicerinada-vegetal-transparente-960grs" target="_blank" rel="noopener noreferrer">Fonte: Limne Cosméticos</a>.</li>
+          <li><strong>Receita de fornecedor:</strong> base a 60 °C, essência, extrato glicólico e lauril líquido adicionados a 55 °C. <a href="https://www.imperiodasessencias.com.br/produtos/base-artesanal-sabonete-glicerinada-transparente-1kg/" target="_blank" rel="noopener noreferrer">Fonte: Império das Essências</a>.</li>
+          <li><strong>Espiral de Ervas:</strong> derretimento entre 50–60 °C e orientação de não ultrapassar 80 °C <em>para suas bases</em>. <a href="https://espiraldeervas.com.br/aprenda-3-receitas-usando-bases-glicerinadas-naturais/" target="_blank" rel="noopener noreferrer">Fonte: Espiral de Ervas</a>.</li>
+          <li><strong>Stephenson No Sweat:</strong> aquecimento em torno de 75 °C e moldagem de 68–72 °C, de acordo com guia deste produto específico. <a href="https://www.voyageursoapandcandle.com/collections/new-products/products/stephenson-no-sweat-transparent-melt-pour-soap" target="_blank" rel="noopener noreferrer">Fonte: ficha do produto Stephenson</a>.</li>
+        </ul>
+      </details>
     </section>
     <footer><strong>Atenção:</strong> os valores apenas reproduzem matematicamente a receita informada. A fórmula não foi validada para uso na pele: confirme o limite da essência (IFRA categoria 9), a ficha técnica da base e o tipo/concentração do lauril. São muitos aditivos para uma base pronta, e a compatibilidade precisa ser verificada.</footer>
   </main>
