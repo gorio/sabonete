@@ -73,6 +73,7 @@
     @media(max-width:530px) { main { margin:22px auto 35px; } .card { padding:18px; border-radius:17px; } .tabs button { font-size:13px; } }
     @media print { body { background:white; } .card { box-shadow:none; } }
   </style>
+  <link rel="stylesheet" href="palette.css">
 </head>
 <body>
   <main>
@@ -109,6 +110,36 @@
       <p class="note" id="explain">Os volumes acima reproduzem sua forma de medir os ingredientes. Eles não representam percentuais em massa.</p>
     </section>
 
+
+    <section class="card color-card" id="cores" aria-labelledby="colorTitle">
+      <h2 id="colorTitle">Misturador de cores</h2>
+      <p class="color-intro">Escolha a cor que deseja criar. Veja quais corantes cosméticos líquidos misturar e em que proporção.</p>
+      <div class="color-grid" id="colorPalette" role="group" aria-label="Cor desejada"></div>
+      <div class="color-details" aria-live="polite">
+        <div class="color-header"><span class="color-dot" id="selectedSwatch" aria-hidden="true"></span><h3 id="selectedColor">Vermelho</h3></div>
+        <p id="colorHint">Use corante vermelho adequado para sabonete.</p>
+        <p id="colorBatch"></p>
+        <div class="color-dose">
+          <label for="colorTotal">Total de corantes para este lote (mL) — opcional</label>
+          <div class="weightbox"><input id="colorTotal" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 0,5" aria-describedby="colorDoseInfo"><span class="unit">mL</span></div>
+          <p class="hint" id="colorDoseInfo">Informe a dosagem total permitida pela ficha do corante e da base. Se deixar em branco, a conta usa 1 mL <strong>apenas como exemplo matemático</strong>.</p>
+        </div>
+        <div class="color-recipe">
+          <p class="mix-label" id="mixHeading">Proporção de mistura</p>
+          <table aria-label="Volumes da mistura"><tbody id="colorRows"></tbody></table>
+          <p id="colorSummary"></p>
+        </div>
+      </div>
+      <p class="color-caution"><strong>Importante:</strong> proporções ilustrativas, não fórmulas de tonalidade garantida nem recomendações de dosagem. Use corantes <strong>cosméticos adequados para sabonetes</strong> e compatíveis entre si. Bases brancas tendem a cores pastéis; bases transparentes, a cores mais vivas. Teste uma pequena quantidade antes de produzir. <strong>Micas e pigmentos em pó</strong> devem ser medidos em massa, não pelo campo em mL.</p>
+      <details class="color-sources"><summary>Orientações técnicas e fontes</summary>
+        <p>Adicione o corante aos poucos à base líquida, respeitando o limite indicado pelo fabricante. O resultado depende do tipo, diluição e marca dos corantes, da base e da essência utilizada.</p>
+        <ul>
+          <li><a href="https://www.brambleberry.com/ingredient-information/which-colorant-to-use.html" target="_blank" rel="noopener noreferrer">Bramble Berry — tipos de corantes para sabonete glicerinado</a></li>
+          <li><a href="https://www.brambleberry.com/soap/color-handmade-soap.html" target="_blank" rel="noopener noreferrer">Bramble Berry — orientações de utilização por tipo de corante</a></li>
+          <li><a href="https://www.soapqueen.eu/c-662609/info-color-mixing/" target="_blank" rel="noopener noreferrer">SoapQueen Europe — diferença entre base branca e transparente</a></li>
+        </ul>
+      </details>
+    </section>
     <section class="card temp-section" id="temperaturas" aria-labelledby="titulo-temperaturas">
       <div class="temp-head">
         <h2 id="titulo-temperaturas">Temperaturas de preparo</h2>
@@ -197,5 +228,6 @@
       update();
     })();
   </script>
+  <script src="palette.js" defer></script>
 </body>
 </html>
