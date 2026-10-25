@@ -53,7 +53,7 @@
         {id:'a09',title:'Moldes, rendimento e registro',minutes:10,
           goal:'Conferir o rendimento real em unidades, perdas e peso por peça.',
           topics:['Capacidade das cavidades e produção por lote','Rendimento real versus peso teórico','Registro de data, materiais, observações e eventuais perdas'], 
-          task:'Simule um lote na receita e registre quantas unidades sua forma produz; depois compare com a produção real.',tool:'venda'}
+          task:'Use Formas e Moldes para planejar um lote, confira o rendimento previsto e depois compare com a produção real.',tool:'moldes'}
       ]
     },
     {
@@ -281,7 +281,7 @@
     drawVideo(lesson);
     $('courseToolLink').href='#'+lesson.tool;
     const tools={receita:'Abrir calculadora de receita',ingredientes:'Abrir matérias-primas',
-      venda:'Abrir preço de venda',cores:'Abrir misturador de cores',temperaturas:'Abrir temperaturas'};
+      venda:'Abrir preço de venda',moldes:'Abrir Formas e Moldes',cores:'Abrir misturador de cores',temperaturas:'Abrir temperaturas'};
     $('courseToolLink').textContent=tools[lesson.tool]||'Abrir ferramenta';
     $('courseComplete').setAttribute('aria-pressed',String(completed.has(id)));
     $('courseComplete').textContent=completed.has(id)?
