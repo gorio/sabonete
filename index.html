@@ -115,8 +115,24 @@
 
 
     <section class="card pricing-card" id="venda" aria-labelledby="pricing-title">
-      <h2 id="pricing-title">Quanto cobrar por sabonete?</h2>
-      <p class="pricing-lead">Informe quantas unidades o lote rendeu. O preço por sabonete aparece logo abaixo, usando o custo dos ingredientes cadastrados.</p>
+      <h2 id="pricing-title">Precifique seus sabonetes</h2>
+      <p class="pricing-lead">Primeiro informe o preço e a quantidade de <strong>todos os ingredientes</strong>. Depois, o rendimento do lote e o acréscimo desejado. O preço aparece no final.</p>
+
+      <div class="p-step-heading">
+        <span class="p-step-number">1</span>
+        <div><h3>Ingredientes, quantidades e preços</h3>
+        <p class="pricing-help">Para cada item, informe o tamanho da embalagem, quanto pagou e quanto utilizou na produção. Você pode alterar também as quantidades que vieram da receita acima.</p></div>
+      </div>
+      <div id="p_products" class="p-products" aria-label="Ingredientes, quantidades e preços"></div>
+      <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar ingrediente ou produto</button>
+      <p class="p-materials-description">Exemplos: corante, outra essência ou óleo vegetal. Aceitamos g, kg, mL, L e unidades. O consumo dos quatro ingredientes iniciais é sugerido pela receita e pode ser ajustado ou restaurado.</p>
+      <p id="p_status" class="pricing-status" role="status">Preencha o que estiver faltando para concluir a precificação.</p>
+
+      <div class="p-step-heading p-step-divider">
+        <span class="p-step-number">2</span>
+        <div><h3>Produção e acréscimo</h3>
+        <p class="pricing-help">Informe quantos sabonetes o lote rendeu e quanto quer acrescentar sobre o custo dos ingredientes.</p></div>
+      </div>
       <div class="pricing-fields">
         <div class="pricing-field">
           <label for="p_units">Unidades produzidas</label>
@@ -127,29 +143,23 @@
           <input id="p_markup_input" type="text" inputmode="decimal" value="150" autocomplete="off">
         </div>
       </div>
-      <p class="pricing-help" id="markup-note">150% de acréscimo = custo dos ingredientes × 2,5.</p>
+      <p class="pricing-help" id="markup-note">150% de acréscimo sobre o custo = multiplicar por 2,5.</p>
+      <p class="pricing-help" id="p_recipe_batch">Receita calculada acima.</p>
+
+      <div class="p-step-heading p-step-divider">
+        <span class="p-step-number">3</span>
+        <div><h3>Resultado da precificação</h3>
+        <p class="pricing-help">Os valores de venda só são liberados após o preenchimento de todos os ingredientes.</p></div>
+      </div>
       <div class="p-sale-hero incomplete" id="p_hero" aria-live="polite">
-        <span class="p-sale-title" id="p_sale_label">Preço por sabonete</span>
+        <span class="p-sale-title" id="p_sale_label">Preço sugerido por sabonete</span>
         <strong class="p-sale-price" id="p_sale_price">—</strong>
-        <p class="p-sale-note" id="p_price_explainer">Calculando custo dos ingredientes e quantidade produzida.</p>
-        <div class="p-quick-missing" id="p_quick_missing">
-          <label for="p_ext_quick">Tamanho da embalagem de extrato glicólico de Hamamélis</label>
-          <div class="p-quick-input">
-            <input id="p_ext_quick" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 100" aria-label="Quantidade do frasco de extrato">
-            <select id="p_ext_quick_unit" class="p-quick-unit" aria-label="Unidade do frasco de extrato">
-              <option value="mL">mL</option>
-              <option value="L">L</option>
-            </select>
-          </div>
-          <p class="p-quick-help" id="p_ext_quick_note">Informe a quantidade e a unidade da embalagem comprada, não o volume usado na receita.</p>
-          <p class="p-quick-help">Este campo permanece visível enquanto você digita ou corrige o volume; o preço é recalculado automaticamente.</p>
-        </div>
-        <p id="p_status" class="pricing-status" role="status">Complete os preços para ver o valor por sabonete.</p>
+        <p class="p-sale-note" id="p_price_explainer">Complete as informações acima para calcular o preço.</p>
       </div>
       <div class="p-lot-sale incomplete" id="p_lot_sale" aria-live="polite">
         <span id="p_total_sale_label">Valor total de venda do lote</span>
         <strong id="p_total_sale">—</strong>
-        <small id="p_total_sale_note">Preço por sabonete multiplicado pela quantidade produzida.</small>
+        <small id="p_total_sale_note">Preço por sabonete multiplicado pelas unidades produzidas.</small>
       </div>
       <div class="p-simple-info">
         <div class="p-simple-item">
@@ -161,29 +171,21 @@
           <strong id="p_batch_total">—</strong>
         </div>
       </div>
-      <p class="pricing-help" id="p_recipe_batch">Receita calculada acima.</p>
-      <p class="pricing-help">O peso estimado por sabonete é <strong id="p_unit_weight">—</strong>. O preço considera o rendimento informado, não o peso de uma forma padrão.</p>
+      <p class="pricing-help">Peso teórico por sabonete: <strong id="p_unit_weight">—</strong>, calculado pela receita principal e pelo rendimento. Alterações manuais de ingredientes adicionais não atualizam esse peso automaticamente.</p>
 
       <div class="p-breakdown" aria-labelledby="p_breakdown_title">
-        <h3 id="p_breakdown_title">Valor individual de cada ingrediente</h3>
-        <p class="p-breakdown-caption">Quanto cada matéria-prima custa por sabonete e quanto foi gasto no lote inteiro. As quantidades são atualizadas pela receita acima.</p>
+        <h3 id="p_breakdown_title">Detalhamento dos custos</h3>
+        <p class="p-breakdown-caption">Custo de cada ingrediente por sabonete e no lote inteiro. Valores pendentes aparecem com traço.</p>
         <div id="p_breakdown_rows" class="p-breakdown-list"></div>
         <div class="p-breakdown-totals">
           <div><span>Ingredientes por sabonete</span><strong id="p_breakdown_unit_total">—</strong></div>
           <div><span>Ingredientes no lote</span><strong id="p_breakdown_lot_total">—</strong></div>
         </div>
       </div>
-      <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar ingrediente ou produto</button>
-      <p class="p-materials-description">Cadastre essência, corante, óleo vegetal, extrato ou outro ingrediente. Preencha o <strong>nome</strong>, o <strong>tamanho e preço da embalagem</strong> e a <strong>quantidade utilizada neste lote</strong>. Escolha g/kg para peso ou mL/L para volume. O custo será incluído automaticamente no valor por sabonete e no total do lote.</p>
-      <details class="p-prices-panel" id="p_materials">
-        <summary>Editar preços e matérias-primas</summary>
-        <p class="pricing-help">Para cada produto adicional: selecione o tipo (volume, peso ou unidade), a quantidade comprada e sua unidade, o preço pago, além da quantidade usada e sua unidade. Exemplo: frasco de 1 L por R$ 26,00, consumo de 15 mL. Os dados ficam salvos neste navegador.</p>
-        <div id="p_products" class="p-products" aria-label="Matérias-primas e valores"></div>
-      </details>
-      <p class="pricing-assumptions">Produtos adicionais entram no <strong>custo</strong> usando a quantidade informada no lote. Não mudam automaticamente o peso final teórico da receita: para isso, seriam necessárias as densidades e a fórmula completa. O acréscimo comercial não equivale a lucro líquido, pois despesas indiretas não estão detalhadas.</p>
-      <p class="p-notice">A fórmula volumétrica 8/7/10 foi fornecida por você e não é uma validação técnica para uso ou venda. Verifique os limites da base, da fragrância (IFRA categoria 9) e a compatibilidade do lauril.</p>
+      <p class="pricing-assumptions">A estimativa usa a receita original e a quantidade produzida. Quantidades alteradas manualmente e insumos extras entram na conta financeira, mas não alteram o peso final teórico sem dados de densidade. O acréscimo não equivale a lucro líquido: despesas indiretas não estão detalhadas.</p>
+      <p class="p-notice">A fórmula 8/7/10 reproduz as proporções informadas, mas não é uma validação técnica para uso ou venda. Verifique a capacidade da base, o limite IFRA categoria 9 da fragrância e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
-      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-7</p>
+      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-8</p>
     </section>
 
     <section class="card color-card" id="cores" aria-labelledby="colorTitle">
@@ -304,6 +306,6 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=72eb449763556b979a550a876d062fa4db436e47" defer></script>
+  <script src="pricing.js?v=888717882ad78f4539857ec2cf189231b2d1c7bd" defer></script>
 </body>
 </html>
