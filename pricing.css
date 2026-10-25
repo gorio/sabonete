@@ -118,3 +118,24 @@
 .p-product-row:has(.p-remove) .p-product-fields>.p-field:first-child select{width:100%}
 .p-product-row .p-field-label{line-height:1.35}
 @media(max-width:380px){.p-usage-row{grid-template-columns:minmax(0,1fr) 73px;gap:6px}}
+
+/* Order of use: ingredients first, yield second, results last. */
+.p-step-heading{display:flex;align-items:flex-start;gap:11px;margin:20px 0 12px}
+.p-step-heading h3{font-size:17px;line-height:1.35;margin:0 0 5px;color:var(--ink)}
+.p-step-heading .pricing-help{margin:0}
+.p-step-number{display:grid;place-items:center;width:29px;height:29px;flex:none;border-radius:50%;font-size:14px;font-weight:800;background:var(--light);color:var(--accent)}
+.p-step-divider{border-top:1px solid var(--stroke);padding-top:19px;margin-top:24px}
+.p-product-row{padding:15px}
+.p-product-fields{gap:11px}
+.p-usage-help{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:6px 10px;margin-top:-4px}
+.p-usage-note{font-size:11px;color:var(--muted);line-height:1.35}
+.p-restore-recipe{border:1px solid #b9d1be;border-radius:8px;background:#eff7f1;color:var(--accent);padding:8px 10px;font-size:11px;font-weight:750;cursor:pointer}
+.p-restore-recipe:focus-visible{outline:3px solid #88bb9b}
+.p-prices-panel{display:none}
+.pricing-card .pricing-status{margin:12px 0 5px}
+@media(max-width:410px){
+ .p-product-row{padding:11px}
+ .p-product-fields{gap:8px}
+ .p-step-heading{gap:8px}
+ .p-step-heading h3{font-size:16px}
+}
