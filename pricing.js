@@ -392,8 +392,6 @@
     state.products.push(item);
     renderRows();store();calculate();
     const row=Array.from(byId('p_products').children).find(e=>e.dataset.id===item.id);
-    const details=byId('p_materials');
-    if(details) details.open=true;
     if(row) {
       const name=row.querySelector('.p-name');
       if(name)name.focus();
