@@ -157,6 +157,16 @@
         activeLesson=byTrack[activeTrack][0].id;
     }
   }catch(_){}
+  // Um link especifico para um curso tem prioridade sobre a selecao salva.
+  // Permite campanhas distintas e paginas de oferta por nivel sem login.
+  try {
+    const requested=new URLSearchParams(window.location.search).get('curso');
+    if(tracks.some(t=>t.id===requested)){
+      activeTrack=requested;
+      if(!byTrack[requested].some(l=>l.id===activeLesson))
+        activeLesson=byTrack[requested][0].id;
+    }
+  }catch(_){}
 
   const el=(tag,cls,text)=>{
     const node=document.createElement(tag);
@@ -297,7 +307,18 @@
     updateProgress();
     paintUpsell();
     showLesson(activeLesson,false);
-    if(scroll)$('courseCatalog').scrollIntoView({block:'start',behavior:'smooth'});
+    if(scroll){
+      // Preserva UTMs e fornece link unico para compartilhar cada produto.
+      try {
+        if(window.history && typeof window.history.replaceState==='function'){
+          const next=new URL(window.location.href);
+          next.searchParams.set('curso',id);
+          next.hash='treinamento';
+          window.history.replaceState(null,'',next.toString());
+        }
+      }catch(_){}
+      $('courseCatalog').scrollIntoView({block:'start',behavior:'smooth'});
+    }
   }
   productButtons.forEach(btn=>btn.addEventListener('click',()=>selectTrack(btn.dataset.trackSelect,true)));
   $('courseUpsellButton').addEventListener('click',()=>{
