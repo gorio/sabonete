@@ -75,13 +75,37 @@
   </style>
   <link rel="stylesheet" href="palette.css">
   <link rel="stylesheet" href="pricing.css?v=8d01ed80878562dd42ed4785c1fd64a2953025cc">
+  <link rel="stylesheet" href="app.css?v=20261025-menus1">
 </head>
 <body>
-  <main>
-    <div class="eyebrow">Sabonete vegetal</div>
-    <h1>Calculadora simples</h1>
-    <p class="intro">Informe o peso da base ou o peso desejado do sabonete. Veja quanto usar de cada ingrediente na sua proporção atual.</p>
-    <section class="card" aria-label="Cálculo de ingredientes">
+  <div class="app-shell">
+    <aside class="app-sidebar" aria-label="Menu de ferramentas">
+      <div class="app-brand">
+        <span class="app-brand-mark" aria-hidden="true">❧</span>
+        <div><strong>Sabonete Vegetal</strong><small>Calculadora e ferramentas</small></div>
+      </div>
+      <div class="app-nav-title">Ferramentas</div>
+      <nav class="module-nav" aria-label="Navegação entre ferramentas">
+        <a class="module-link" data-screen-link="receita" href="#receita" aria-current="page"><span class="module-icon" aria-hidden="true">⚖️</span> Receita</a>
+        <a class="module-link" data-screen-link="ingredientes" href="#ingredientes"><span class="module-icon" aria-hidden="true">📦</span> Matérias-primas</a>
+        <a class="module-link" data-screen-link="venda" href="#venda"><span class="module-icon" aria-hidden="true">💰</span> Preço de venda</a>
+        <a class="module-link" data-screen-link="cores" href="#cores"><span class="module-icon" aria-hidden="true">🎨</span> Cores</a>
+        <a class="module-link" data-screen-link="temperaturas" href="#temperaturas"><span class="module-icon" aria-hidden="true">🌡️</span> Temperaturas</a>
+      </nav>
+      <p class="sidebar-note">Sua receita e seus preços permanecem disponíveis ao trocar de menu.</p>
+    </aside>
+    <div class="app-stage">
+      <header class="app-topbar">
+        <span class="app-kicker">Ferramentas para produção artesanal</span>
+        <h1 id="screenHeading">Calcule sua receita</h1>
+        <p id="screenDescription">Defina a quantidade de base vegetal ou o peso final estimado e consulte a proporção de cada ingrediente.</p>
+      </header>
+      <main id="content" class="app-content">
+    <section class="card module-screen" id="receita" data-screen="receita" aria-labelledby="recipe-title">
+      <div class="module-head">
+        <h2 id="recipe-title">Calcular ingredientes</h2>
+        <p>Preencha somente o peso. A proporção atual é aplicada automaticamente à base vegetal.</p>
+      </div>
       <div class="tabs" role="group" aria-label="Escolha o tipo de cálculo">
         <button type="button" class="active" id="tabBase" aria-pressed="true">Tenho a base</button>
         <button type="button" id="tabFinal" aria-pressed="false">Quero peso final</button>
@@ -114,9 +138,9 @@
 
 
 
-    <section class="card pricing-card" id="venda" aria-labelledby="pricing-title">
-      <h2 id="pricing-title">Precifique seus sabonetes</h2>
-      <p class="pricing-lead">Primeiro informe o preço e a quantidade de <strong>todos os ingredientes</strong>. Depois, o rendimento do lote e o acréscimo desejado. O preço aparece no final.</p>
+    <section class="card pricing-card module-screen" id="ingredientes" data-screen="ingredientes" aria-labelledby="ingredients-title">
+      <h2 id="ingredients-title">Cadastro de matérias-primas</h2>
+      <p class="pricing-lead">Organize aqui os produtos comprados e as quantidades utilizadas. O custo fica disponível automaticamente no menu de venda.</p>
 
       <div class="p-step-heading">
         <span class="p-step-number">1</span>
@@ -127,9 +151,14 @@
       <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar ingrediente ou produto</button>
       <p class="p-materials-description">Exemplos: corante, outra essência ou óleo vegetal. Aceitamos g, kg, mL, L e unidades. O consumo dos quatro ingredientes iniciais é sugerido pela receita e pode ser ajustado ou restaurado.</p>
       <p id="p_status" class="pricing-status" role="status">Preencha o que estiver faltando para concluir a precificação.</p>
+    </section>
 
+    <section class="card pricing-card module-screen" id="venda" data-screen="venda" aria-labelledby="pricing-title">
+      <h2 id="pricing-title">Resultado e preço de venda</h2>
+      <p class="pricing-lead">Confira o rendimento e o preço sugerido. Os ingredientes e seus custos são compartilhados com o cadastro de matérias-primas.</p>
+      <p class="app-shortcuts">Quer alterar um preço ou quantidade? <a class="app-inline-link" href="#ingredientes">Abrir matérias-primas</a>.</p>
       <div class="p-step-heading p-step-divider">
-        <span class="p-step-number">2</span>
+        <span class="p-step-number">1</span>
         <div><h3>Produção e acréscimo</h3>
         <p class="pricing-help">Informe quantos sabonetes o lote rendeu e quanto quer acrescentar sobre o custo dos ingredientes.</p></div>
       </div>
@@ -147,7 +176,7 @@
       <p class="pricing-help" id="p_recipe_batch">Receita calculada acima.</p>
 
       <div class="p-step-heading p-step-divider">
-        <span class="p-step-number">3</span>
+        <span class="p-step-number">2</span>
         <div><h3>Resultado da precificação</h3>
         <p class="pricing-help">Os valores de venda só são liberados após o preenchimento de todos os ingredientes.</p></div>
       </div>
@@ -188,7 +217,7 @@
       <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-8</p>
     </section>
 
-    <section class="card color-card" id="cores" aria-labelledby="colorTitle">
+    <section class="card color-card module-screen" id="cores" data-screen="cores" aria-labelledby="colorTitle">
       <h2 id="colorTitle">Misturador de cores</h2>
       <p class="color-intro">Escolha a cor que deseja criar. Veja quais corantes cosméticos líquidos misturar e em que proporção.</p>
       <div class="color-grid" id="colorPalette" role="group" aria-label="Cor desejada"></div>
@@ -217,7 +246,7 @@
         </ul>
       </details>
     </section>
-    <section class="card temp-section" id="temperaturas" aria-labelledby="titulo-temperaturas">
+    <section class="card temp-section module-screen" id="temperaturas" data-screen="temperaturas" aria-labelledby="titulo-temperaturas">
       <div class="temp-head">
         <h2 id="titulo-temperaturas">Temperaturas de preparo</h2>
         <p>Guia rápido para derreter a base e adicionar os ingredientes, com termômetro.</p>
@@ -258,7 +287,9 @@
       </details>
     </section>
     <footer><strong>Atenção:</strong> os valores apenas reproduzem matematicamente a receita informada. A fórmula não foi validada para uso na pele: confirme o limite da essência (IFRA categoria 9), a ficha técnica da base e o tipo/concentração do lauril. São muitos aditivos para uma base pronta, e a compatibilidade precisa ser verificada.</footer>
-  </main>
+      </main>
+    </div>
+  </div>
   <script>
     'use strict';
     (() => {
@@ -307,5 +338,6 @@
   </script>
   <script src="palette.js" defer></script>
   <script src="pricing.js?v=8599876994e5a087bb8e72e3fa5dfbb14421ccba" defer></script>
+  <script src="app.js?v=20261025-menus1" defer></script>
 </body>
 </html>
