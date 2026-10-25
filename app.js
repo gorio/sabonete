@@ -10,6 +10,10 @@
       title:'Meu Ateliê',
       description:'Guarde receitas, prepare lotes, acompanhe checklists e exporte seus dados para backup.'
     },
+    moldes:{
+      title:'Formas e Moldes',
+      description:'Cadastre suas formas e calcule a quantidade estimada de ingredientes para cada lote.'
+    },
     ingredientes:{
       title:'Matérias-primas',
       description:'Cadastre preços de compra, tamanhos de embalagem e quantidades utilizadas. Você pode adicionar novos produtos.'
@@ -35,7 +39,7 @@
   const links=Array.from(document.querySelectorAll('[data-screen-link]'));
   const title=document.getElementById('screenHeading');
   const subtitle=document.getElementById('screenDescription');
-  if(!title || !subtitle || pages.length!==7 || links.length!==7)return;
+  if(!title || !subtitle || pages.length!==8 || links.length!==8)return;
 
   const selectedHash=()=>{
     let hash='';
