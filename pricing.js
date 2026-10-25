@@ -58,7 +58,10 @@
           && ['pack','price','used'].every(k=>typeof p[k]==='string'&&p[k].length<50));
         const original=DEFAULT_PRODUCTS.map(core=>{
           const past=restored.find(p=>p.id===core.id && p.type===core.type);
-          return past?{...core, name:past.name, pack:past.pack, packUnit:validPackUnit(core.unit,past.packUnit), price:past.price}:core;
+          return past?{...core, name:past.name, pack:past.pack,
+            packUnit:validPackUnit(core.unit,past.packUnit), price:past.price,
+            used:typeof past.used==='string'?past.used:'',
+            usedUnit:validPackUnit(core.unit,past.usedUnit)}:core;
         });
         const customs=restored.filter(p=>p.type==='custom' && !original.some(c=>c.id===p.id)).map(p=>({...p,
           packUnit:validPackUnit(p.unit,p.packUnit),
@@ -123,7 +126,7 @@
         row.remove();store();calculate();
       });
       heading.append(remove);
-    } else heading.append(make('span','p-auto','Receita automática'));
+    } else heading.append(make('span','p-auto','Uso sugerido pela receita'));
     row.append(heading);
     const fields=make('div','p-product-fields');
     if(p.type==='custom'){
@@ -170,9 +173,11 @@
     packageRow.append(amountWrap,packageUnitWrap);
     fields.append(packageRow);
     fields.append(makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00'));
-    if(p.type==='custom'){
+    {
       const useRow=make('div','p-usage-row');
-      const useAmount=makeInput('Quantidade utilizada no lote',p.used,value=>{p.used=value;store();calculate();},'Ex.: 2');
+      const useAmount=makeInput('Quantidade utilizada no lote',
+        p.type==='custom'?p.used:(p.used!==''?p.used:autoUsedDisplay(p,formula().base)),
+        value=>{p.used=value;store();calculate();},p.type==='custom'?'Ex.: 2':'Quantidade da receita');
       useAmount.querySelector('input').dataset.role='used-quantity';
       const useUnitWrap=make('label','p-field p-used-unit');
       useUnitWrap.append(make('span','p-field-label','Unidade utilizada'));
@@ -185,10 +190,40 @@
         useSelect.append(opt);
       });
       useSelect.value=currentUsedUnit;
-      useSelect.addEventListener('change',()=>{p.usedUnit=useSelect.value;store();calculate();});
+      useSelect.addEventListener('change',()=>{
+        if(p.type!=='custom'&&p.used===''){
+          p.usedUnit=useSelect.value;
+          useAmount.querySelector('input').value=autoUsedDisplay(p,formula().base);
+        } else {
+          const previous=validPackUnit(p.unit,p.usedUnit);
+          const amount=numeric(p.used);
+          if(Number.isFinite(amount)){
+            const baseValue=amount*(previous==='L'||previous==='kg'?1000:1);
+            p.used=String(baseValue/(useSelect.value==='L'||useSelect.value==='kg'?1000:1)).replace('.',',');
+            useAmount.querySelector('input').value=p.used;
+          }
+          p.usedUnit=useSelect.value;
+        }
+        store();calculate();
+      });
       useUnitWrap.append(useSelect);
       useRow.append(useAmount,useUnitWrap);
       fields.append(useRow);
+      if(p.type!=='custom'){
+        const hintRow=make('div','p-usage-help');
+        const hint=make('span','p-usage-note','');
+        hint.dataset.role='usage-mode';
+        const reset=make('button','p-restore-recipe','Restaurar quantidade da receita');
+        reset.type='button';
+        reset.addEventListener('click',()=>{
+          p.used='';p.usedUnit=p.unit;
+          useSelect.value=p.unit;
+          useAmount.querySelector('input').value=autoUsedDisplay(p,formula().base);
+          store();calculate();
+        });
+        hintRow.append(hint,reset);
+        fields.append(hintRow);
+      }
     }
     row.append(fields);
     const usage=make('div','p-product-foot');
@@ -212,15 +247,29 @@
     const base=positive(input)?(final?input/1.25:input):NaN;
     return {base,estimatedFinal:base*1.25};
   }
-  function usedAmount(p, base) {
+  function recipeUsed(p,base) {
+    if(!Number.isFinite(base))return NaN;
     if(p.type==='base')return base;
     if(p.type==='ess')return base*0.08;
     if(p.type==='ext')return base*0.07;
     if(p.type==='lau')return base*0.10;
+    return NaN;
+  }
+  function autoUsedDisplay(p,base) {
+    const amount=recipeUsed(p,base);
+    if(!Number.isFinite(amount))return '';
+    const unit=validPackUnit(p.unit,p.usedUnit);
+    return new Intl.NumberFormat('pt-BR',{maximumFractionDigits:5}).format(
+      amount/(unit==='L'||unit==='kg'?1000:1));
+  }
+  function usedAmount(p, base) {
+    // The built-in formula acts as a default until the user edits a quantity.
+    if(p.type!=='custom' && (p.used==='' || p.used==null))
+      return recipeUsed(p,base);
     const value=numeric(p.used);
     if(!Number.isFinite(value))return NaN;
     const unit=validPackUnit(p.unit,p.usedUnit);
-    // Convert L to mL and kg to g before costing; never interconvert volume and mass.
+    // Convert L -> mL and kg -> g, without mixing mass and volume.
     return value*(unit==='L'||unit==='kg'?1000:1);
   }
   function calculate(){
@@ -240,6 +289,15 @@
       if(row){
         const usage=row.querySelector('[data-role="usage"]');
         if(usage)usage.textContent='Uso no lote: '+measure(used,p.unit);
+        if(p.type!=='custom'){
+          const field=row.querySelector('[data-role="used-quantity"]');
+          if(field && p.used==='' && document.activeElement!==field)
+            field.value=autoUsedDisplay(p,base);
+          const mode=row.querySelector('[data-role="usage-mode"]');
+          if(mode)mode.textContent=p.used===''?
+            'Automático pela receita. Você pode alterar esta quantidade.':
+            'Quantidade informada manualmente; use Restaurar para voltar à receita.';
+        }
       }
       // Uma embalagem de 1 mL para 14,56 mL consumidos costuma indicar
       // que "1 litro" foi digitado como "1 mL". Nao distorcer precos.
@@ -287,25 +345,24 @@
     const weightPerBar=Number.isFinite(estimatedFinal)&&validUnits?estimatedFinal/n:NaN;
     const hero=byId('p_hero');
     hero.classList.toggle('incomplete',!complete);
-    output('p_sale_label',complete?'Preço sugerido por sabonete':'Preço parcial por sabonete');
-    output('p_sale_price',money(unitSale));
+    output('p_sale_label',complete?'Preço sugerido por sabonete':'Preço sugerido (após completar os ingredientes)');
+    output('p_sale_price',complete?money(unitSale):'—');
     output('p_cost_unit',money(unitCost));
     output('p_batch_total',usable?money(subtotal):'—');
     output('p_breakdown_unit_total',money(unitCost));
     output('p_breakdown_lot_total',usable?money(subtotal):'—');
-    output('p_total_sale',money(Number.isFinite(unitSale)&&validUnits?unitSale*n:NaN));
+    output('p_total_sale',complete?money(Number.isFinite(unitSale)&&validUnits?unitSale*n:NaN):'—');
     output('p_units_copy',validUnits?n+' sabonete(s)':'lote');
     const saleTotal=byId('p_lot_sale');
     saleTotal.classList.toggle('incomplete',!complete);
-    output('p_total_sale_label',complete?'Valor total de venda do lote':'Valor parcial de venda do lote');
+    output('p_total_sale_label',complete?'Valor total de venda do lote':'Valor total de venda (pendente)');
     output('p_total_sale_note',complete?'Preço unitário × unidades produzidas.':
-      'Referência parcial: ainda falta informar custo de uma ou mais matérias-primas.');
+      'Preencha todos os ingredientes para visualizar o valor total de venda.');
     output('p_unit_weight',measure(weightPerBar,'g/un'));
     output('p_price_explainer',!usable?'Informe o peso e a quantidade de sabonetes para calcular.':
       !validMarkup?'Informe um percentual de acréscimo válido.':
       complete?'Valor por unidade, usando os custos cadastrados e '+NUM.format(markup)+'% de acréscimo. Não inclui despesas indiretas detalhadas.':
-      'Valor APENAS PARCIAL, com '+known+' ingrediente(s) calculado(s) de '+state.products.length+
-      '. Não utilize como preço final até completar os custos.');
+      'Cadastre as quantidades e os preços de todos os ingredientes para calcular o preço final. '+known+' de '+state.products.length+' itens completos.');
     output('markup-note',validMarkup?
       NUM.format(markup)+'% de acréscimo sobre o custo = custo x '+NUM.format(1+markup/100)+
       '. Este acréscimo não é uma margem de lucro de '+NUM.format(markup)+'% sobre a venda.':
@@ -317,59 +374,17 @@
     if(!positive(base))issues.push('Informe o peso na calculadora de ingredientes.');
     if(!validUnits)issues.push('Informe o rendimento em unidades inteiras maiores que zero.');
     if(!validMarkup)issues.push('Informe um percentual de acréscimo válido.');
-    if(missing.length)issues.push('Ainda falta o custo de: '+missing.join(', ')+'.');
+    if(missing.length)issues.push('Complete antes de precificar: '+missing.join(', ')+'.');
     const status=byId('p_status');
     status.textContent=issues.join(' ');
     status.hidden=issues.length===0;
-    const ext=state.products.find(p=>p.id==='ext');
-    const quick=byId('p_ext_quick'),quickUnit=byId('p_ext_quick_unit');
-    if(ext && document.activeElement!==quick && quick.value!==ext.pack)quick.value=ext.pack;
-    if(ext && document.activeElement!==quickUnit)quickUnit.value=validPackUnit(ext.unit,ext.packUnit);
-    const extQty=ext?packageAmount(ext):NaN;
-    const suspiciousExt=ext&&positive(extQty)&&extQty<=1&&usedAmount(ext,base)>extQty;
-    // Campo permanente: nunca recolher enquanto o usuario altera 1 -> 10 -> 100.
-    // Um valor temporariamente valido nao deve desmontar o proprio editor.
-    byId('p_quick_missing').hidden=!ext;
-    output('p_ext_quick_note',suspiciousExt?
-      'Atenção: informado '+ext.pack+' '+validPackUnit(ext.unit,ext.packUnit)+
-      ' por '+money(numeric(ext.price))+'. Isso equivale a '+money(numeric(ext.price)/extQty)+
-      '/mL. Confira: o frasco é de 1 mL ou de 1 L (1.000 mL)? Se for 1 litro, escolha L.':
-      'Informe a quantidade e a unidade da embalagem comprada, não o volume usado na receita.');
+
   }
   load();
   Object.keys(formFields).forEach(id=>{
     const key=formFields[id],elem=byId(id);
     elem.value=state[key];
     elem.addEventListener('input',()=>{state[key]=elem.value;store();calculate();});
-  });
-  byId('p_ext_quick').addEventListener('focus',()=>{
-    const ext=state.products.find(p=>p.id==='ext');
-    if(!ext)return;
-    const currentAmount=packageAmount(ext);
-    const {base}=formula();
-    const seemsWrong=!positive(currentAmount) ||
-      (currentAmount<=1 && usedAmount(ext,base)>currentAmount);
-    if(seemsWrong && typeof byId('p_ext_quick').select==='function'){
-      byId('p_ext_quick').select();
-    }
-  });
-  byId('p_ext_quick').addEventListener('input',()=>{
-    const ext=state.products.find(p=>p.id==='ext');
-    if(!ext)return;
-    ext.pack=byId('p_ext_quick').value;
-    const row=Array.from(byId('p_products').children).find(el=>el.dataset.id==='ext');
-    const packField=row&&row.querySelector('#p_ext_pack_input');
-    if(packField&&document.activeElement!==packField)packField.value=ext.pack;
-    store();calculate();
-  });
-  byId('p_ext_quick_unit').addEventListener('change',()=>{
-    const ext=state.products.find(p=>p.id==='ext');
-    if(!ext)return;
-    ext.packUnit=byId('p_ext_quick_unit').value;
-    const row=Array.from(byId('p_products').children).find(el=>el.dataset.id==='ext');
-    const select=row&&row.querySelector('[data-role="package-unit"]');
-    if(select)select.value=ext.packUnit;
-    store();calculate();
   });
   byId('p_add').addEventListener('click',()=>{
     if(state.products.length>=MAX_ITEMS)return;
