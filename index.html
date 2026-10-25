@@ -133,12 +133,15 @@
         <strong class="p-sale-price" id="p_sale_price">—</strong>
         <p class="p-sale-note" id="p_price_explainer">Calculando custo dos ingredientes e quantidade produzida.</p>
         <div class="p-quick-missing" id="p_quick_missing">
-          <label for="p_ext_quick">Para completar: quantos mL contém o frasco de extrato glicólico de Hamamélis?</label>
+          <label for="p_ext_quick">Qual é o tamanho do frasco de extrato glicólico Hamamélis?</label>
           <div class="p-quick-input">
-            <input id="p_ext_quick" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 100" aria-label="Volume da embalagem do extrato em mililitros">
-            <span class="unit">mL</span>
+            <input id="p_ext_quick" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 100" aria-label="Quantidade do frasco de extrato">
+            <select id="p_ext_quick_unit" class="p-quick-unit" aria-label="Unidade do frasco de extrato">
+              <option value="mL">mL</option>
+              <option value="L">L</option>
+            </select>
           </div>
-          <p class="p-quick-help">Informe o volume real da embalagem; não é o volume usado na receita. O preço muda automaticamente e esse dado fica salvo neste navegador.</p>
+          <p class="p-quick-help" id="p_ext_quick_note">Informe a quantidade e a unidade da embalagem comprada, não o volume usado na receita.</p>
         </div>
         <p id="p_status" class="pricing-status" role="status">Complete os preços para ver o valor por sabonete.</p>
       </div>
@@ -179,7 +182,7 @@
       <p class="pricing-assumptions">O valor sugerido aplica o acréscimo informado sobre o custo das matérias-primas. Ele não representa lucro líquido: embalagem, mão de obra, taxas, perdas e impostos não são calculados separadamente. A fórmula e o peso final continuam estimados quando faltam as densidades dos líquidos.</p>
       <p class="p-notice">A fórmula volumétrica 8/7/10 foi fornecida por você e não é uma validação técnica para uso ou venda. Verifique os limites da base, da fragrância (IFRA categoria 9) e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
-      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-4</p>
+      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-5</p>
     </section>
 
     <section class="card color-card" id="cores" aria-labelledby="colorTitle">
@@ -300,6 +303,6 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=7eadfb770692592da29bcf5c81a5355f87023fd0" defer></script>
+  <script src="pricing.js?v=059770786e042e1e5777db6dc41bb298c3c07230" defer></script>
 </body>
 </html>
