@@ -102,3 +102,11 @@
  .p-breakdown-values strong{font-size:14px}
  .p-breakdown-totals strong{font-size:16px}
 }
+
+/* Unidade explicita por embalagem: 1 L corresponde a 1000 mL; 1 kg a 1000 g */
+.p-package-row{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:8px;grid-column:1/-1;align-items:end}
+.p-package-row .p-field{min-width:0}
+.p-pack-unit .p-input{width:100%;text-align:center}
+.p-quick-input .p-quick-unit{flex:0 0 84px;border:1px solid #d2dcd4;border-radius:10px;background:#fff;color:var(--ink);font:700 15px system-ui,sans-serif;padding:10px 8px;min-height:47px}
+.p-quick-unit:focus-visible{outline:3px solid #88bb9b}
+@media(max-width:380px){.p-package-row{grid-template-columns:minmax(0,1fr) 73px;gap:6px}.p-quick-input .p-quick-unit{flex-basis:70px}}
