@@ -400,6 +400,73 @@
   });
   ['weight','tabBase','tabFinal'].forEach(id=>
     byId(id).addEventListener(id==='weight'?'input':'click',calculate));
+  // API publica para o Atelie: somente dados locais, sem autenticacao/remoto.
+  // Os precos ficam vinculados a cada versao salva da receita.
+  function pricingSummary(){
+    const {base,estimatedFinal}=formula();
+    const units=numeric(state.units),markup=numeric(state.markup);
+    const validUnits=Number.isInteger(units)&&units>0&&units<=1e7;
+    const validMarkup=nonNegative(markup)&&markup<=1e5;
+    let total=0,validCount=0;
+    const lines=state.products.map(p=>{
+      const used=usedAmount(p,base),pack=packageAmount(p),price=numeric(p.price);
+      const suspicious=positive(pack)&&pack<=1&&used>pack&&p.unit!=='un';
+      const valid=positive(pack)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0&&!suspicious;
+      const cost=valid?used*price/pack:null;
+      if(valid){total+=cost;validCount++;}
+      return {name:p.name,used:Number.isFinite(used)?used:null,unit:p.unit,cost};
+    });
+    const complete=positive(base)&&validUnits&&validMarkup&&validCount===state.products.length;
+    const roundedPrice=complete?Math.round((total/units*(1+markup/100)+Number.EPSILON)*100)/100:null;
+    return {
+      complete,base:Number.isFinite(base)?base:null,
+      estimatedFinal:Number.isFinite(estimatedFinal)?estimatedFinal:null,
+      units:validUnits?units:null,markup:validMarkup?markup:null,
+      batchCost:complete?total:null,unitCost:complete?total/units:null,
+      unitPrice:roundedPrice,salesTotal:roundedPrice===null?null:roundedPrice*units,
+      lines
+    };
+  }
+  function validPricingDraft(raw){
+    if(!raw||!Array.isArray(raw.products)||raw.products.length<4||raw.products.length>MAX_ITEMS||
+       !Number.isInteger(raw.next)||raw.next<1||raw.next>1e8||
+       typeof raw.units!=='string'||raw.units.length>49||
+       typeof raw.markup!=='string'||raw.markup.length>49)return false;
+    const seen=new Set();
+    for(const p of raw.products){
+      if(!p||typeof p.id!=='string'||p.id.length>39||seen.has(p.id)||
+         !['g','mL','un'].includes(p.unit)||typeof p.name!=='string'||p.name.length>149||
+         !['pack','price','used'].every(k=>typeof p[k]==='string'&&p[k].length<49))
+         return false;
+      seen.add(p.id);
+      if(['base','ess','ext','lau'].includes(p.id)){
+        if(p.type!==p.id||p.unit!==(p.id==='base'?'g':'mL'))return false;
+      } else if(p.type!=='custom'||!/^extra-\d+$/.test(p.id))return false;
+    }
+    return ['base','ess','ext','lau'].every(id=>seen.has(id));
+  }
+  window.SabonetePricing=Object.freeze({
+    capture:()=>clone(state),
+    summary:pricingSummary,
+    apply:raw=>{
+      if(!validPricingDraft(raw))return false;
+      const snapshot=clone(state);
+      try{
+        localStorage.setItem(KEY,JSON.stringify(raw));
+        state={products:clone(DEFAULT_PRODUCTS),...baseDefaults,next:1};
+        load();
+        for(const [id,key] of Object.entries(formFields))byId(id).value=state[key];
+        renderRows();
+        calculate();
+        return true;
+      }catch(_){
+        state=snapshot;
+        for(const [id,key] of Object.entries(formFields))byId(id).value=state[key];
+        renderRows();calculate();
+        return false;
+      }
+    }
+  });
   renderRows();
   calculate();
 })();
