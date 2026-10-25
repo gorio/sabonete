@@ -82,7 +82,16 @@
     $('weight').value=f.weight;
     $('weight').dispatchEvent(new Event('input',{bubbles:true}));
   }
+  function updateStats(){
+    const stats=[
+      ['atelierTotalRecipes',data.recipes.length],
+      ['atelierPlannedLots',data.batches.filter(b=>b.status==='planejado').length],
+      ['atelierCompletedLots',data.batches.filter(b=>b.status==='concluido').length]
+    ];
+    stats.forEach(([id,value])=>{const node=$(id);if(node)node.textContent=String(value)});
+  }
   function renderRecipes(){
+    updateStats();
     const holder=$('atelierRecipeList');holder.replaceChildren();
     $('atelierRecipeCount').textContent=data.recipes.length+' / '+MAX_RECIPES+' receitas salvas';
     if(!data.recipes.length){
@@ -116,6 +125,7 @@
     });
   }
   function renderBatches(){
+    updateStats();
     const holder=$('atelierBatchList');holder.replaceChildren();
     $('atelierBatchCount').textContent=data.batches.length+' / '+MAX_BATCHES+' registros';
     if(!data.batches.length){
