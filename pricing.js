@@ -28,6 +28,9 @@
   const nonNegative = value => Number.isFinite(value) && value>=0 && value<=1e10;
   const positive = value => nonNegative(value) && value>0;
   const money = value => Number.isFinite(value)?BRL.format(value):'—';
+  // Fractions of a cent matter for the purchase price per mL or gram.
+  const PRECISE = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:4,maximumFractionDigits:4});
+  const moneyPrecise = value => Number.isFinite(value)?PRECISE.format(value):'—';
   const measure = (value,unit) => Number.isFinite(value)?NUM.format(value)+' '+unit:'—';
   const output = (id,value) => {const e=byId(id); if(e)e.textContent=value;};
   const formFields = {p_units:'units',p_markup_input:'markup'};
@@ -133,7 +136,9 @@
     uses.dataset.role='usage';
     const cost=make('strong','p-cost','Custo: —');
     cost.dataset.role='cost';
-    usage.append(uses,cost);row.append(usage);
+    const perPurchase=make('span','p-cost-unit-source','Valor por '+p.unit+': —');
+    perPurchase.dataset.role='purchase-unit';
+    usage.append(uses,perPurchase,cost);row.append(usage);
     return row;
   }
   function renderRows(){
@@ -162,6 +167,8 @@
     let subtotal=0,known=0;
     const missing=[];
     const rows=new Map(Array.from(byId('p_products').children).map(row=>[row.dataset.id,row]));
+    const breakdown=byId('p_breakdown_rows');
+    const breakdownItems=[];
 
     state.products.forEach(p=>{
       const used=usedAmount(p,base), qty=numeric(p.pack), price=numeric(p.price);
@@ -172,10 +179,30 @@
       }
       const validProduct=positive(qty)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0;
       const cost=validProduct?used*price/qty:NaN;
+      const purchaseUnit=positive(qty)&&nonNegative(price)?price/qty:NaN;
+      const individual=validProduct&&validUnits?cost/n:NaN;
       if(row){
         const label=row.querySelector('[data-role="cost"]');
-        if(label)label.textContent='Custo: '+money(cost);
+        if(label)label.textContent='Custo do lote: '+money(cost);
+        const purchase=row.querySelector('[data-role="purchase-unit"]');
+        if(purchase)purchase.textContent='Preço por '+p.unit+': '+(Number.isFinite(purchaseUnit)?
+          moneyPrecise(purchaseUnit)+'/'+p.unit:'—');
       }
+      const item=make('article','p-breakdown-item');
+      const head=make('div','p-breakdown-item-head');
+      head.append(make('strong','',p.name.trim()||'Novo ingrediente'),
+        make('span','', 'Usado no lote: '+measure(used,p.unit)));
+      item.append(head);
+      const cols=make('div','p-breakdown-values');
+      const perPiece=make('div','');
+      perPiece.append(make('small','','Custo por sabonete'),
+        make('strong','',money(individual)));
+      const perLot=make('div','');
+      perLot.append(make('small','','Custo total no lote'),
+        make('strong','',money(cost)));
+      cols.append(perPiece,perLot);
+      item.append(cols);
+      breakdownItems.push(item);
       if(validProduct){
         subtotal+=cost;
         known++;
@@ -183,6 +210,7 @@
         missing.push(p.name.trim()||'matéria-prima sem nome');
       }
     });
+    breakdown.replaceChildren(...breakdownItems);
     const usable=positive(base)&&validUnits&&known>0;
     const complete=usable&&missing.length===0;
     const unitCost=usable?subtotal/n:NaN;
@@ -194,6 +222,15 @@
     output('p_sale_price',money(unitSale));
     output('p_cost_unit',money(unitCost));
     output('p_batch_total',usable?money(subtotal):'—');
+    output('p_breakdown_unit_total',money(unitCost));
+    output('p_breakdown_lot_total',usable?money(subtotal):'—');
+    output('p_total_sale',money(Number.isFinite(unitSale)&&validUnits?unitSale*n:NaN));
+    output('p_units_copy',validUnits?n+' sabonete(s)':'lote');
+    const saleTotal=byId('p_lot_sale');
+    saleTotal.classList.toggle('incomplete',!complete);
+    output('p_total_sale_label',complete?'Valor total de venda do lote':'Valor parcial de venda do lote');
+    output('p_total_sale_note',complete?'Preço unitário × unidades produzidas.':
+      'Referência parcial: ainda falta informar custo de uma ou mais matérias-primas.');
     output('p_unit_weight',measure(weightPerBar,'g/un'));
     output('p_price_explainer',!usable?'Informe o peso e a quantidade de sabonetes para calcular.':
       !validMarkup?'Informe um percentual de acréscimo válido.':
@@ -241,7 +278,12 @@
     state.products.push(item);
     renderRows();store();calculate();
     const row=Array.from(byId('p_products').children).find(e=>e.dataset.id===item.id);
-    if(row)row.querySelector('.p-name').focus();
+    const details=byId('p_materials');
+    if(details) details.open=true;
+    if(row) {
+      row.querySelector('.p-name').focus();
+      if(typeof row.scrollIntoView==='function')row.scrollIntoView({behavior:'smooth',block:'center'});
+    }
   });
   ['weight','tabBase','tabFinal'].forEach(id=>
     byId(id).addEventListener(id==='weight'?'input':'click',calculate));
