@@ -76,7 +76,7 @@
   <link rel="stylesheet" href="palette.css">
   <link rel="stylesheet" href="pricing.css?v=8d01ed80878562dd42ed4785c1fd64a2953025cc">
   <link rel="stylesheet" href="app.css?v=20261025-menus1">
-  <link rel="stylesheet" href="training.css?v=20261025-curso1">
+  <link rel="stylesheet" href="training.css?v=20261025-niveis1">
 </head>
 <body>
   <div class="app-shell">
@@ -222,27 +222,69 @@
 
     <section class="card module-screen" id="treinamento" data-screen="treinamento" aria-labelledby="training-heading">
       <div class="course-hero">
-        <span class="course-eyebrow">Escola do artesão · Curso em preparação</span>
-        <h2 id="training-heading">Aprenda a produzir e precificar seus sabonetes</h2>
-        <p>Uma trilha prática para conhecer bases vegetais prontas, medir ingredientes, planejar lotes e entender os custos. Os vídeos serão incluídos conforme forem gravados e publicados.</p>
+        <span class="course-eyebrow">Escola do artesão · 3 formações em planejamento</span>
+        <h2 id="training-heading">Do primeiro sabonete ao negócio artesanal</h2>
+        <p>Escolha seu próximo passo. O Básico ensina a começar, o Intermediário ajuda a produzir e precificar, e o Avançado organiza a operação de quem quer vender com mais controle.</p>
         <div class="course-meta">
-          <span>5 módulos</span>
-          <span id="courseCount">13 aulas planejadas</span>
+          <span>3 treinamentos</span>
+          <span id="courseCount">18 aulas planejadas</span>
           <span id="courseDuration">Tempo previsto</span>
-          <span>Atividades práticas</span>
+          <span>Progressão com upsell</span>
         </div>
       </div>
+      <div class="training-products" id="courseProducts" aria-label="Três níveis de treinamento">
+        <article class="training-product" data-tier="basico">
+          <div class="training-product-top"><span>Produto 01</span><span>Iniciante</span></div>
+          <h3>Básico</h3>
+          <p class="training-product-tagline">Comece com confiança</p>
+          <p>Para quem está dando os primeiros passos com base glicerinada vegetal pronta.</p>
+          <ul>
+            <li>Fundamentos, equipamentos e segurança</li>
+            <li>Gramas, mililitros e cálculos iniciais</li>
+            <li>Planejamento do primeiro lote</li>
+          </ul>
+          <span class="training-product-count">5 aulas planejadas</span>
+          <button class="training-product-button" type="button" data-track-select="basico" aria-pressed="true">Ver programa</button>
+        </article>
+        <article class="training-product" data-tier="intermediario">
+          <div class="training-product-top"><span>Produto 02</span><span>Continuação do Básico</span></div>
+          <h3>Intermediário</h3>
+          <p class="training-product-tagline">Produza com consistência</p>
+          <p>Para quem já conhece o processo e quer melhorar a qualidade e a previsibilidade.</p>
+          <ul>
+            <li>Aditivos, temperaturas, cores e moldes</li>
+            <li>Rendimento real e padronização</li>
+            <li>Cadastro de insumos e precificação</li>
+          </ul>
+          <span class="training-product-count">6 aulas planejadas</span>
+          <button class="training-product-button" type="button" data-track-select="intermediario" aria-pressed="false">Ver programa</button>
+        </article>
+        <article class="training-product" data-tier="avancado">
+          <div class="training-product-top"><span>Produto 03</span><span>Continuação do Intermediário</span></div>
+          <h3>Avançado</h3>
+          <p class="training-product-tagline">Estruture o negócio artesanal</p>
+          <p>Para organizar uma produção maior, lidar com pedidos e acompanhar resultados.</p>
+          <ul>
+            <li>Qualidade, lotes e rastreabilidade</li>
+            <li>Estoque, kits, atacado e encomendas</li>
+            <li>Rotinas, custos e evolução do negócio</li>
+          </ul>
+          <span class="training-product-count">7 aulas planejadas</span>
+          <button class="training-product-button" type="button" data-track-select="avancado" aria-pressed="false">Ver programa</button>
+        </article>
+      </div>
+      <p class="training-commerce-note"><strong>Estrutura comercial em preparação:</strong> os três níveis são propostas de produtos separados e complementares. Preços, matrículas, proteção das aulas pagas e condições de upgrade ainda não estão disponíveis. Os botões exibem somente os programas.</p>
       <div class="course-progress-wrap">
         <div class="course-progress-head">
-          <strong id="courseProgressText">0 de 13 atividades marcadas</strong>
+          <strong id="courseProgressText">0 de 5 atividades marcadas neste nível</strong>
           <span id="courseProgressPercent">0%</span>
         </div>
-        <progress id="courseProgress" max="13" value="0" aria-label="Progresso nas atividades marcadas"></progress>
+        <progress id="courseProgress" max="5" value="0" aria-label="Progresso nas atividades marcadas"></progress>
         <p>Você pode marcar atividades concluídas para acompanhar seus estudos. O progresso é salvo apenas neste navegador; não equivale a certificação ou confirmação de vídeo assistido.</p>
       </div>
-      <div class="course-layout">
+      <div class="course-layout" id="courseCatalog">
         <aside class="course-lesson-list" aria-label="Aulas do treinamento">
-          <div class="course-list-title">Roteiro do treinamento</div>
+          <div class="course-list-title" id="courseSelectedName">Aulas do nível Básico</div>
           <div id="courseLessons"></div>
         </aside>
         <article class="course-lesson-details" id="courseLessonDetails" aria-labelledby="courseLessonTitle">
@@ -275,6 +317,15 @@
             </div>
           </div>
         </article>
+      </div>
+      <div class="course-upsell" id="courseUpsell">
+        <div>
+          <span class="course-upsell-eyebrow">Próximo nível</span>
+          <h3 id="courseUpsellTitle">Seu próximo passo: Intermediário</h3>
+          <p id="courseUpsellText">Conheça o conteúdo do próximo treinamento.</p>
+          <small>Conhecer o programa não realiza uma compra ou matrícula.</small>
+        </div>
+        <button id="courseUpsellButton" type="button">Conhecer próximo nível</button>
       </div>
       <p class="course-safety"><strong>Nota de segurança:</strong> o treinamento trata de sabonetes em barra produzidos com base pronta, não de saponificação com soda. Os cálculos não validam automaticamente a segurança das fórmulas. Confirme as fichas técnicas, os limites de fragrância aplicáveis (IFRA categoria 9), a compatibilidade dos aditivos e os requisitos sanitários e de rotulagem antes de fabricar ou comercializar.</p>
     </section>
@@ -400,7 +451,7 @@
   </script>
   <script src="palette.js" defer></script>
   <script src="pricing.js?v=8599876994e5a087bb8e72e3fa5dfbb14421ccba" defer></script>
-  <script src="training.js?v=20261025-curso1" defer></script>
+  <script src="training.js?v=20261025-niveis1" defer></script>
   <script src="app.js?v=20261025-curso2" defer></script>
 </body>
 </html>
