@@ -6,6 +6,10 @@
       title:'Calcule sua receita',
       description:'Defina a quantidade de base vegetal ou o peso final estimado e consulte a proporção de cada ingrediente.'
     },
+    atelie:{
+      title:'Meu Ateliê',
+      description:'Guarde receitas, prepare lotes, acompanhe checklists e exporte seus dados para backup.'
+    },
     ingredientes:{
       title:'Matérias-primas',
       description:'Cadastre preços de compra, tamanhos de embalagem e quantidades utilizadas. Você pode adicionar novos produtos.'
@@ -31,7 +35,7 @@
   const links=Array.from(document.querySelectorAll('[data-screen-link]'));
   const title=document.getElementById('screenHeading');
   const subtitle=document.getElementById('screenDescription');
-  if(!title || !subtitle || pages.length!==6 || links.length!==6)return;
+  if(!title || !subtitle || pages.length!==7 || links.length!==7)return;
 
   const selectedHash=()=>{
     let hash='';
