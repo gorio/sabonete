@@ -107,3 +107,6 @@
 @media(max-width:1250px){.training-products{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:920px){.training-products{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:710px){.training-products{grid-template-columns:1fr}.training-product{padding:17px}.training-product ul{flex:none}.course-upsell{flex-direction:column;align-items:stretch}.course-upsell button{max-width:none;width:100%}}
+
+.training-product-share{font-size:11px;color:var(--accent);font-weight:750;text-align:center;text-decoration:underline;text-underline-offset:3px;padding:2px}
+.training-product-share:focus-visible{outline:3px solid #92c7a2;outline-offset:2px;border-radius:4px}
