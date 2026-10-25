@@ -10,12 +10,20 @@
   const NUM = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:2, minimumFractionDigits:2});
   const MAX_ITEMS=60;
   const DEFAULT_PRODUCTS = [
-    {id:'base',type:'base', name:'Base vegetal V&G / Quimiz',unit:'g', pack:'3000',price:'78,89', used:''},
-    {id:'ess',type:'ess', name:'Essência Capim-Limão',unit:'mL',pack:'100',price:'26,60',used:''},
-    {id:'ext',type:'ext', name:'Extrato glicólico Hamamélis',unit:'mL',pack:'',price:'12,00',used:''},
-    {id:'lau',type:'lau', name:'Lauril Éter Sulfato de Sódio 27%',unit:'mL',pack:'1000',price:'26,00',used:''}
+    {id:'base',type:'base', name:'Base vegetal V&G / Quimiz',unit:'g', pack:'3000',packUnit:'g',price:'78,89', used:''},
+    {id:'ess',type:'ess', name:'Essência Capim-Limão',unit:'mL',pack:'100',packUnit:'mL',price:'26,60',used:''},
+    {id:'ext',type:'ext', name:'Extrato glicólico Hamamélis',unit:'mL',pack:'',packUnit:'mL',price:'12,00',used:''},
+    {id:'lau',type:'lau', name:'Lauril Éter Sulfato de Sódio 27%',unit:'mL',pack:'1000',packUnit:'mL',price:'26,00',used:''}
   ];
   const clone = value => JSON.parse(JSON.stringify(value));
+  const unitChoices = (unit) => unit==='g'?['g','kg']:unit==='mL'?['mL','L']:['un'];
+  const validPackUnit = (unit,packUnit) => unitChoices(unit).includes(packUnit)?packUnit:unit;
+  const packageAmount = (p) => {
+    const value=numeric(p.pack);
+    if(!positive(value))return NaN;
+    const packUnit=validPackUnit(p.unit,p.packUnit);
+    return value*(packUnit==='L'||packUnit==='kg'?1000:1);
+  };
   const baseDefaults={units:'20',markup:'150'};
   let state={products:clone(DEFAULT_PRODUCTS),...baseDefaults,next:1};
   const numeric = raw => {
@@ -50,9 +58,9 @@
           && ['pack','price','used'].every(k=>typeof p[k]==='string'&&p[k].length<50));
         const original=DEFAULT_PRODUCTS.map(core=>{
           const past=restored.find(p=>p.id===core.id && p.type===core.type);
-          return past?{...core, name:past.name, pack:past.pack, price:past.price}:core;
+          return past?{...core, name:past.name, pack:past.pack, packUnit:validPackUnit(core.unit,past.packUnit), price:past.price}:core;
         });
-        const customs=restored.filter(p=>p.type==='custom' && !original.some(c=>c.id===p.id));
+        const customs=restored.filter(p=>p.type==='custom' && !original.some(c=>c.id===p.id)).map(p=>({...p,packUnit:validPackUnit(p.unit,p.packUnit)}));
         state={...state,products:[...original,...customs.slice(0,MAX_ITEMS-4)],next:saved.next};
         Object.keys(baseDefaults).forEach(key=>{
           if(typeof saved[key]==='string' && saved[key].length<50)state[key]=saved[key];
@@ -123,11 +131,28 @@
       ['mL','g','un'].forEach(unit=>{
         const option=make('option','',unit);option.value=unit;option.selected=unit===p.unit;select.append(option);
       });
-      select.addEventListener('change',()=>{p.unit=select.value;store();renderRows();calculate();});
+      select.addEventListener('change',()=>{p.unit=select.value;p.packUnit=select.value;store();renderRows();calculate();});
       unitWrap.append(select);fields.append(unitWrap);
     }
-    fields.append(makeInput('Embalagem ('+p.unit+')',p.pack,value=>{p.pack=value;store();calculate();},'Ex.: 100'));
-    if (p.id==='ext') { const packageInput=fields.querySelector('input'); if(packageInput) packageInput.id='p_ext_pack_input'; }
+    const packageRow=make('div','p-package-row');
+    const amountWrap=makeInput('Quantidade da embalagem',p.pack,value=>{p.pack=value;store();calculate();},'Ex.: 100');
+    if(p.id==='ext')amountWrap.querySelector('input').id='p_ext_pack_input';
+    const packageUnitWrap=make('label','p-field p-pack-unit');
+    packageUnitWrap.append(make('span','p-field-label','Unidade da embalagem'));
+    const packSelect=make('select','p-input');
+    packSelect.setAttribute('aria-label','Unidade da embalagem de '+p.name);
+    packSelect.dataset.role='package-unit';
+    const selectedUnit=validPackUnit(p.unit,p.packUnit);
+    unitChoices(p.unit).forEach(unit=>{
+      const opt=make('option','',unit);
+      opt.value=unit; opt.selected=selectedUnit===unit;
+      packSelect.append(opt);
+    });
+    packSelect.value=selectedUnit;
+    packSelect.addEventListener('change',()=>{p.packUnit=packSelect.value;store();calculate();});
+    packageUnitWrap.append(packSelect);
+    packageRow.append(amountWrap,packageUnitWrap);
+    fields.append(packageRow);
     fields.append(makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00'));
     if(p.type==='custom')fields.append(makeInput('Uso neste lote ('+p.unit+')',p.used,value=>{p.used=value;store();calculate();},'Ex.: 2'));
     row.append(fields);
@@ -171,15 +196,18 @@
     const breakdownItems=[];
 
     state.products.forEach(p=>{
-      const used=usedAmount(p,base), qty=numeric(p.pack), price=numeric(p.price);
+      const used=usedAmount(p,base), qty=packageAmount(p), price=numeric(p.price);
       const row=rows.get(p.id);
       if(row){
         const usage=row.querySelector('[data-role="usage"]');
         if(usage)usage.textContent='Uso no lote: '+measure(used,p.unit);
       }
-      const validProduct=positive(qty)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0;
+      // Uma embalagem de 1 mL para 14,56 mL consumidos costuma indicar
+      // que "1 litro" foi digitado como "1 mL". Nao distorcer precos.
+      const suspicious=positive(qty)&&qty<=1&&used>qty&&p.unit!=='un';
+      const validProduct=positive(qty)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0&&!suspicious;
       const cost=validProduct?used*price/qty:NaN;
-      const purchaseUnit=positive(qty)&&nonNegative(price)?price/qty:NaN;
+      const purchaseUnit=positive(qty)&&nonNegative(price)&&!suspicious?price/qty:NaN;
       const individual=validProduct&&validUnits?cost/n:NaN;
       if(row){
         const label=row.querySelector('[data-role="cost"]');
@@ -207,7 +235,7 @@
         subtotal+=cost;
         known++;
       } else {
-        missing.push(p.name.trim()||'matéria-prima sem nome');
+        missing.push(suspicious?(p.name.trim()||'Matéria-prima')+' (unidade da embalagem precisa de conferência)':(p.name.trim()||'matéria-prima sem nome'));
       }
     });
     breakdown.replaceChildren(...breakdownItems);
@@ -255,9 +283,17 @@
     status.textContent=issues.join(' ');
     status.hidden=issues.length===0;
     const ext=state.products.find(p=>p.id==='ext');
-    const quick=byId('p_ext_quick');
+    const quick=byId('p_ext_quick'),quickUnit=byId('p_ext_quick_unit');
     if(ext && document.activeElement!==quick && quick.value!==ext.pack)quick.value=ext.pack;
-    byId('p_quick_missing').hidden=!ext || positive(numeric(ext.pack));
+    if(ext && document.activeElement!==quickUnit)quickUnit.value=validPackUnit(ext.unit,ext.packUnit);
+    const extQty=ext?packageAmount(ext):NaN;
+    const suspiciousExt=ext&&positive(extQty)&&extQty<=1&&usedAmount(ext,base)>extQty;
+    byId('p_quick_missing').hidden=!ext || (positive(extQty)&&!suspiciousExt);
+    output('p_ext_quick_note',suspiciousExt?
+      'Atenção: informado '+ext.pack+' '+validPackUnit(ext.unit,ext.packUnit)+
+      ' por '+money(numeric(ext.price))+'. Isso equivale a '+money(numeric(ext.price)/extQty)+
+      '/mL. Confira: o frasco é de 1 mL ou de 1 L (1.000 mL)? Se for 1 litro, escolha L.':
+      'Informe a quantidade e a unidade da embalagem comprada, não o volume usado na receita.');
   }
   load();
   Object.keys(formFields).forEach(id=>{
@@ -274,9 +310,18 @@
     if(packField&&document.activeElement!==packField)packField.value=ext.pack;
     store();calculate();
   });
+  byId('p_ext_quick_unit').addEventListener('change',()=>{
+    const ext=state.products.find(p=>p.id==='ext');
+    if(!ext)return;
+    ext.packUnit=byId('p_ext_quick_unit').value;
+    const row=Array.from(byId('p_products').children).find(el=>el.dataset.id==='ext');
+    const select=row&&row.querySelector('[data-role="package-unit"]');
+    if(select)select.value=ext.packUnit;
+    store();calculate();
+  });
   byId('p_add').addEventListener('click',()=>{
     if(state.products.length>=MAX_ITEMS)return;
-    const item={id:'extra-'+state.next++,type:'custom',name:'',unit:'mL',pack:'',price:'',used:''};
+    const item={id:'extra-'+state.next++,type:'custom',name:'',unit:'mL',pack:'',packUnit:'mL',price:'',used:''};
     state.products.push(item);
     renderRows();store();calculate();
     const row=Array.from(byId('p_products').children).find(e=>e.dataset.id===item.id);
