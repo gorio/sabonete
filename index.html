@@ -76,6 +76,7 @@
   <link rel="stylesheet" href="palette.css">
   <link rel="stylesheet" href="pricing.css?v=8d01ed80878562dd42ed4785c1fd64a2953025cc">
   <link rel="stylesheet" href="app.css?v=20261025-menus1">
+  <link rel="stylesheet" href="training.css?v=20261025-curso1">
 </head>
 <body>
   <div class="app-shell">
@@ -89,6 +90,7 @@
         <a class="module-link" data-screen-link="receita" href="#receita" aria-current="page"><span class="module-icon" aria-hidden="true">⚖️</span> Receita</a>
         <a class="module-link" data-screen-link="ingredientes" href="#ingredientes"><span class="module-icon" aria-hidden="true">📦</span> Matérias-primas</a>
         <a class="module-link" data-screen-link="venda" href="#venda"><span class="module-icon" aria-hidden="true">💰</span> Preço de venda</a>
+        <a class="module-link" data-screen-link="treinamento" href="#treinamento"><span class="module-icon" aria-hidden="true">🎓</span> Treinamento</a>
         <a class="module-link" data-screen-link="cores" href="#cores"><span class="module-icon" aria-hidden="true">🎨</span> Cores</a>
         <a class="module-link" data-screen-link="temperaturas" href="#temperaturas"><span class="module-icon" aria-hidden="true">🌡️</span> Temperaturas</a>
       </nav>
@@ -217,6 +219,66 @@
       <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-8</p>
     </section>
 
+
+    <section class="card module-screen" id="treinamento" data-screen="treinamento" aria-labelledby="training-heading">
+      <div class="course-hero">
+        <span class="course-eyebrow">Escola do artesão · Curso em preparação</span>
+        <h2 id="training-heading">Aprenda a produzir e precificar seus sabonetes</h2>
+        <p>Uma trilha prática para conhecer bases vegetais prontas, medir ingredientes, planejar lotes e entender os custos. Os vídeos serão incluídos conforme forem gravados e publicados.</p>
+        <div class="course-meta">
+          <span>5 módulos</span>
+          <span id="courseCount">13 aulas planejadas</span>
+          <span id="courseDuration">Tempo previsto</span>
+          <span>Atividades práticas</span>
+        </div>
+      </div>
+      <div class="course-progress-wrap">
+        <div class="course-progress-head">
+          <strong id="courseProgressText">0 de 13 atividades marcadas</strong>
+          <span id="courseProgressPercent">0%</span>
+        </div>
+        <progress id="courseProgress" max="13" value="0" aria-label="Progresso nas atividades marcadas"></progress>
+        <p>Você pode marcar atividades concluídas para acompanhar seus estudos. O progresso é salvo apenas neste navegador; não equivale a certificação ou confirmação de vídeo assistido.</p>
+      </div>
+      <div class="course-layout">
+        <aside class="course-lesson-list" aria-label="Aulas do treinamento">
+          <div class="course-list-title">Roteiro do treinamento</div>
+          <div id="courseLessons"></div>
+        </aside>
+        <article class="course-lesson-details" id="courseLessonDetails" aria-labelledby="courseLessonTitle">
+          <span class="course-lesson-eyebrow" id="courseLessonNumber">Módulo 1 · Aula 1</span>
+          <h3 id="courseLessonTitle">Boas-vindas e visão geral</h3>
+          <p class="course-lesson-goal" id="courseLessonGoal">Conheça o processo de fabricação com base glicerinada vegetal pronta.</p>
+          <small class="course-lesson-duration" id="courseLessonDuration">Duração planejada</small>
+          <div class="course-player" id="courseVideo" aria-label="Área da vídeo-aula">
+            <div class="course-video-placeholder">
+              <span class="course-play-icon" aria-hidden="true">▶</span>
+              <strong>Vídeo-aula em preparação</strong>
+              <span>Os vídeos reais aparecerão aqui quando forem publicados.</span>
+            </div>
+          </div>
+          <p class="course-video-state" id="courseVideoState">Vídeo ainda não publicado</p>
+          <div class="course-body">
+            <h4>O que você vai aprender</h4>
+            <ul id="courseLessonTopics"></ul>
+            <div class="course-activity">
+              <strong>Atividade prática</strong>
+              <p id="courseLessonTask">Prepare uma lista dos ingredientes e equipamentos que já possui.</p>
+            </div>
+            <a class="course-tool-link" id="courseToolLink" href="#receita">Abrir ferramenta relacionada</a>
+          </div>
+          <div class="course-actions">
+            <button id="courseComplete" class="course-complete" type="button" aria-pressed="false">Marcar atividade como concluída</button>
+            <div class="course-pager">
+              <button id="coursePrev" type="button">Aula anterior</button>
+              <button id="courseNext" type="button">Próxima aula</button>
+            </div>
+          </div>
+        </article>
+      </div>
+      <p class="course-safety"><strong>Nota de segurança:</strong> o treinamento trata de sabonetes em barra produzidos com base pronta, não de saponificação com soda. Os cálculos não validam automaticamente a segurança das fórmulas. Confirme as fichas técnicas, os limites de fragrância aplicáveis (IFRA categoria 9), a compatibilidade dos aditivos e os requisitos sanitários e de rotulagem antes de fabricar ou comercializar.</p>
+    </section>
+
     <section class="card color-card module-screen" id="cores" data-screen="cores" aria-labelledby="colorTitle">
       <h2 id="colorTitle">Misturador de cores</h2>
       <p class="color-intro">Escolha a cor que deseja criar. Veja quais corantes cosméticos líquidos misturar e em que proporção.</p>
@@ -338,6 +400,7 @@
   </script>
   <script src="palette.js" defer></script>
   <script src="pricing.js?v=8599876994e5a087bb8e72e3fa5dfbb14421ccba" defer></script>
-  <script src="app.js?v=20261025-menus1" defer></script>
+  <script src="training.js?v=20261025-curso1" defer></script>
+  <script src="app.js?v=20261025-curso2" defer></script>
 </body>
 </html>
