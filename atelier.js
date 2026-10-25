@@ -218,7 +218,8 @@
   });
   $('atelierBackupDownload').addEventListener('click',()=>{
     const backup={format:'sabonete-backup',version:1,exportedAt:now(),
-      atelier:data,pricing:api.capture(),form:getForm()};
+      atelier:data,pricing:api.capture(),form:getForm(),
+      moldes:window.SaboneteMolds?window.SaboneteMolds.capture():undefined};
     try{
       const content=JSON.stringify(backup,null,2);
       const url=URL.createObjectURL(new Blob([content],{type:'application/json;charset=utf-8'}));
@@ -245,16 +246,23 @@
       }
       if(!window.confirm('Restaurar backup? Isso substituirá as receitas, os planejamentos e a precificação salvos neste navegador.'))return;
       const oldData=data,oldPricing=api.capture(),oldForm=getForm();
+      const moldApi=window.SaboneteMolds;
+      const oldMolds=moldApi?moldApi.capture():null;
       try{
+        // Backups anteriores continuam validos e mantem os moldes atuais.
+        // Se o backup possui moldes, a validacao fica a cargo do modulo de moldes.
+        if(backup.moldes!==undefined && (!moldApi||!moldApi.apply(backup.moldes)))
+          throw Error('Catálogo de moldes incompatível');
         if(!api.apply(backup.pricing))throw Error('Precificação incompatível');
         localStorage.setItem(KEY,JSON.stringify(backup.atelier));
         data=backup.atelier;
         applyForm(backup.form);
         render();
-        setNotice('Backup restaurado com sucesso. Confira ingredientes e preços antes de produzir.');
+        setNotice('Backup restaurado com sucesso. Confira ingredientes, moldes e preços antes de produzir.');
       }catch(_){
         data=oldData;
         api.apply(oldPricing);
+        if(oldMolds && moldApi)moldApi.apply(oldMolds);
         try{localStorage.setItem(KEY,JSON.stringify(oldData))}catch(_){}
         applyForm(oldForm);render();
         setNotice('Falha na restauração. Os dados anteriores foram preservados quando possível.',true);
