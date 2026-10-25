@@ -72,7 +72,7 @@
           if(typeof legacy.p_pack==='string')state.pack=legacy.p_pack;
           if(typeof legacy.p_other==='string')state.other=legacy.p_other;
           if(typeof legacy.p_fee==='string')state.fee=legacy.p_fee;
-          if(typeof legacy.p_sale==='string')state.manualSale=legacy.p_sale;
+          // Nao migrar preco praticado antigo: nova versao parte do lucro automatico de 150%.
         }
       }
     } catch(_) {}
@@ -218,7 +218,7 @@
     output('p_recipe_batch',Number.isFinite(base)?
       'Receita atual: '+measure(base,'g')+' de base; peso final estimado de '+measure(estimatedFinal,'g')+'.':
       'Informe o peso da receita na calculadora acima.');
-    output('p_markup_info','150% sobre o custo significa preço de custo × 2,5. A margem de venda correspondente é 60% sem taxas. Este percentual não é uma margem de 150% sobre vendas.');
+    output('markup-note',nonNegative(markup)? NUM.format(markup)+'% de acréscimo sobre o custo significa multiplicar o custo por '+NUM.format(1+markup/100)+'. Não confunda esse acréscimo com margem sobre a venda.' : 'Informe um percentual de lucro válido.');
     const warning=byId('p_status');
     warning.textContent=problems.join(' ');
     warning.hidden=problems.length===0;
