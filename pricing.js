@@ -214,7 +214,9 @@
     const usable=positive(base)&&validUnits&&known>0;
     const complete=usable&&missing.length===0;
     const unitCost=usable?subtotal/n:NaN;
-    const unitSale=usable&&validMarkup?unitCost*(1+markup/100):NaN;
+    const unitSaleRaw=usable&&validMarkup?unitCost*(1+markup/100):NaN;
+    // Venda e faturamento devem usar o mesmo valor unitario cobrado em centavos.
+    const unitSale=Number.isFinite(unitSaleRaw)?Math.round((unitSaleRaw+Number.EPSILON)*100)/100:NaN;
     const weightPerBar=Number.isFinite(estimatedFinal)&&validUnits?estimatedFinal/n:NaN;
     const hero=byId('p_hero');
     hero.classList.toggle('incomplete',!complete);
