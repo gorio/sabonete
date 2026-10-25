@@ -54,3 +54,10 @@
 .atelier-disclaimer{font-size:12px!important;line-height:1.6;color:#687768;padding:13px 14px;border:1px solid #e1e9dc;border-radius:11px;background:#fffdfa;margin-top:18px}
 @media(max-width:1130px){.atelier-layout{grid-template-columns:1fr}}
 @media(max-width:860px){.atelier-layout{grid-template-columns:1fr}}
+
+/* Painel resumo do Atelie, sem dados pessoais ou sincronizacao */
+.atelier-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.atelier-stat{background:#f0f7f1;border:1px solid #d9e7db;border-radius:13px;padding:15px 17px}
+.atelier-stat span{display:block;font-size:11px;line-height:1.4;color:#597563;font-weight:730}
+.atelier-stat strong{display:block;font-size:27px;letter-spacing:-.025em;margin-top:6px;color:#245c3e;font-variant-numeric:tabular-nums}
+@media(max-width:460px){.atelier-stats{gap:6px}.atelier-stat{padding:12px 9px}.atelier-stat strong{font-size:23px}.atelier-stat span{font-size:10px}}
