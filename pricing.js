@@ -60,7 +60,10 @@
           const past=restored.find(p=>p.id===core.id && p.type===core.type);
           return past?{...core, name:past.name, pack:past.pack, packUnit:validPackUnit(core.unit,past.packUnit), price:past.price}:core;
         });
-        const customs=restored.filter(p=>p.type==='custom' && !original.some(c=>c.id===p.id)).map(p=>({...p,packUnit:validPackUnit(p.unit,p.packUnit)}));
+        const customs=restored.filter(p=>p.type==='custom' && !original.some(c=>c.id===p.id)).map(p=>({...p,
+          packUnit:validPackUnit(p.unit,p.packUnit),
+          usedUnit:validPackUnit(p.unit,p.usedUnit)
+        }));
         state={...state,products:[...original,...customs.slice(0,MAX_ITEMS-4)],next:saved.next};
         Object.keys(baseDefaults).forEach(key=>{
           if(typeof saved[key]==='string' && saved[key].length<50)state[key]=saved[key];
@@ -125,18 +128,31 @@
     const fields=make('div','p-product-fields');
     if(p.type==='custom'){
       const unitWrap=make('label','p-field');
-      unitWrap.append(make('span','p-field-label','Unidade'));
+      unitWrap.append(make('span','p-field-label','Tipo de medida'));
       const select=make('select','p-input');
       select.setAttribute('aria-label','Unidade de medida para '+p.name);
       ['mL','g','un'].forEach(unit=>{
         const option=make('option','',unit);option.value=unit;option.selected=unit===p.unit;select.append(option);
       });
-      select.addEventListener('change',()=>{p.unit=select.value;p.packUnit=select.value;store();renderRows();calculate();});
+      select.addEventListener('change',()=>{
+        if(p.unit===select.value)return;
+        // Never carry a previously-entered liquid amount into a solid weight, or vice versa.
+        p.unit=select.value;
+        p.packUnit=select.value;
+        p.usedUnit=select.value;
+        p.pack='';
+        p.used='';
+        store();renderRows();calculate();
+        const refreshed=Array.from(byId('p_products').children).find(e=>e.dataset.id===p.id);
+        const newPack=refreshed&&refreshed.querySelector('[data-role="pack-quantity"]');
+        if(newPack)newPack.focus();
+      });
       unitWrap.append(select);fields.append(unitWrap);
     }
     const packageRow=make('div','p-package-row');
     const amountWrap=makeInput('Quantidade da embalagem',p.pack,value=>{p.pack=value;store();calculate();},'Ex.: 100');
     if(p.id==='ext')amountWrap.querySelector('input').id='p_ext_pack_input';
+    amountWrap.querySelector('input').dataset.role='pack-quantity';
     const packageUnitWrap=make('label','p-field p-pack-unit');
     packageUnitWrap.append(make('span','p-field-label','Unidade da embalagem'));
     const packSelect=make('select','p-input');
@@ -154,7 +170,26 @@
     packageRow.append(amountWrap,packageUnitWrap);
     fields.append(packageRow);
     fields.append(makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00'));
-    if(p.type==='custom')fields.append(makeInput('Uso neste lote ('+p.unit+')',p.used,value=>{p.used=value;store();calculate();},'Ex.: 2'));
+    if(p.type==='custom'){
+      const useRow=make('div','p-usage-row');
+      const useAmount=makeInput('Quantidade utilizada no lote',p.used,value=>{p.used=value;store();calculate();},'Ex.: 2');
+      useAmount.querySelector('input').dataset.role='used-quantity';
+      const useUnitWrap=make('label','p-field p-used-unit');
+      useUnitWrap.append(make('span','p-field-label','Unidade utilizada'));
+      const useSelect=make('select','p-input');
+      useSelect.dataset.role='used-unit';
+      useSelect.setAttribute('aria-label','Unidade utilizada no lote de '+p.name);
+      const currentUsedUnit=validPackUnit(p.unit,p.usedUnit);
+      unitChoices(p.unit).forEach(unit=>{
+        const opt=make('option','',unit);opt.value=unit;opt.selected=(unit===currentUsedUnit);
+        useSelect.append(opt);
+      });
+      useSelect.value=currentUsedUnit;
+      useSelect.addEventListener('change',()=>{p.usedUnit=useSelect.value;store();calculate();});
+      useUnitWrap.append(useSelect);
+      useRow.append(useAmount,useUnitWrap);
+      fields.append(useRow);
+    }
     row.append(fields);
     const usage=make('div','p-product-foot');
     const uses=make('span','p-used','Uso no lote: —');
@@ -182,7 +217,11 @@
     if(p.type==='ess')return base*0.08;
     if(p.type==='ext')return base*0.07;
     if(p.type==='lau')return base*0.10;
-    return numeric(p.used);
+    const value=numeric(p.used);
+    if(!Number.isFinite(value))return NaN;
+    const unit=validPackUnit(p.unit,p.usedUnit);
+    // Convert L to mL and kg to g before costing; never interconvert volume and mass.
+    return value*(unit==='L'||unit==='kg'?1000:1);
   }
   function calculate(){
     const {base, estimatedFinal}=formula();
@@ -334,14 +373,15 @@
   });
   byId('p_add').addEventListener('click',()=>{
     if(state.products.length>=MAX_ITEMS)return;
-    const item={id:'extra-'+state.next++,type:'custom',name:'',unit:'mL',pack:'',packUnit:'mL',price:'',used:''};
+    const item={id:'extra-'+state.next++,type:'custom',name:'',unit:'mL',pack:'',packUnit:'mL',price:'',used:'',usedUnit:'mL'};
     state.products.push(item);
     renderRows();store();calculate();
     const row=Array.from(byId('p_products').children).find(e=>e.dataset.id===item.id);
     const details=byId('p_materials');
     if(details) details.open=true;
     if(row) {
-      row.querySelector('.p-name').focus();
+      const name=row.querySelector('.p-name');
+      if(name)name.focus();
       if(typeof row.scrollIntoView==='function')row.scrollIntoView({behavior:'smooth',block:'center'});
     }
   });
