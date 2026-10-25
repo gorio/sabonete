@@ -72,3 +72,33 @@
 .p-sale-hero .pricing-status{font-size:12px;text-align:left;margin:12px 0 0;background:#fff7e9}
 .p-sale-hero .pricing-status[hidden],.p-quick-missing[hidden]{display:none}
 @media(max-width:380px){.p-sale-hero{padding:18px 12px}.p-simple-item{padding:10px}.p-simple-item strong{font-size:16px}}
+
+/* Custo de cada materia-prima por sabonete e por lote */
+.p-lot-sale{background:#f0f5f0;border-radius:13px;padding:16px;margin:12px 0;text-align:center;border:1px solid var(--stroke)}
+.p-lot-sale span{font-size:12px;font-weight:750;display:block;color:var(--muted)}
+.p-lot-sale strong{font-size:clamp(25px,7vw,33px);font-variant-numeric:tabular-nums;color:var(--accent);display:block;margin:5px 0}
+.p-lot-sale small{font-size:11px;line-height:1.5;color:var(--muted);display:block}
+.p-lot-sale.incomplete{background:#fff9ef;border-color:#f0dfb8}
+.p-lot-sale.incomplete strong{color:#8b602b}
+.p-breakdown h3{font-size:17px;margin:17px 0 8px}
+.p-breakdown-caption{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 10px}
+.p-breakdown-list{display:grid;gap:8px}
+.p-breakdown-item{border:1px solid var(--stroke);border-radius:11px;padding:12px;background:#fbfdfa}
+.p-breakdown-item-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:3px 12px;margin-bottom:8px}
+.p-breakdown-item-head strong{font-size:13px;color:var(--ink)}
+.p-breakdown-item-head span{font-size:11px;color:var(--muted)}
+.p-breakdown-values{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.p-breakdown-values small{font-size:10px;color:var(--muted);display:block;line-height:1.4}
+.p-breakdown-values strong{display:block;font-size:15px;margin-top:3px;font-variant-numeric:tabular-nums;color:var(--accent)}
+.p-breakdown-totals{background:var(--light);border-radius:11px;padding:12px;margin:10px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.p-breakdown-totals span{font-size:11px;font-weight:700;color:var(--muted);display:block;line-height:1.3}
+.p-breakdown-totals strong{font-size:18px;font-variant-numeric:tabular-nums;color:var(--accent);display:block;margin-top:5px}
+.p-cost-unit-source{display:block;color:var(--muted);font-size:11px;font-weight:450;margin-top:6px}
+.p-add-main{display:block;margin:14px 0 7px}
+.p-materials-description{color:var(--muted);font-size:12px;line-height:1.6}
+.p-prices-panel[open] summary{margin-bottom:12px}
+@media(max-width:390px){
+ .p-breakdown-item{padding:10px}
+ .p-breakdown-values strong{font-size:14px}
+ .p-breakdown-totals strong{font-size:16px}
+}
