@@ -77,6 +77,7 @@
   <link rel="stylesheet" href="pricing.css?v=8d01ed80878562dd42ed4785c1fd64a2953025cc">
   <link rel="stylesheet" href="app.css?v=20261025-menus1">
   <link rel="stylesheet" href="training.css?v=20261025-niveis2">
+  <link rel="stylesheet" href="atelier.css?v=20261025-atelier1">
 </head>
 <body>
   <div class="app-shell">
@@ -88,6 +89,7 @@
       <div class="app-nav-title">Ferramentas</div>
       <nav class="module-nav" aria-label="Navegação entre ferramentas">
         <a class="module-link" data-screen-link="receita" href="#receita" aria-current="page"><span class="module-icon" aria-hidden="true">⚖️</span> Receita</a>
+        <a class="module-link" data-screen-link="atelie" href="#atelie"><span class="module-icon" aria-hidden="true">📒</span> Meu Ateliê</a>
         <a class="module-link" data-screen-link="ingredientes" href="#ingredientes"><span class="module-icon" aria-hidden="true">📦</span> Matérias-primas</a>
         <a class="module-link" data-screen-link="venda" href="#venda"><span class="module-icon" aria-hidden="true">💰</span> Preço de venda</a>
         <a class="module-link" data-screen-link="treinamento" href="#treinamento"><span class="module-icon" aria-hidden="true">🎓</span> Treinamento</a>
@@ -139,6 +141,54 @@
 
 
 
+
+    <section class="card module-screen" id="atelie" data-screen="atelie" aria-labelledby="atelier-title">
+      <div class="atelier-banner">
+        <span class="atelier-eyebrow">Organização da produção artesanal</span>
+        <h2 id="atelier-title">Meu Ateliê</h2>
+        <p>Guarde suas receitas, planeje lotes e acompanhe sua produção. Os registros são locais e não alteram seu estoque automaticamente.</p>
+      </div>
+      <div class="atelier-layout">
+        <section class="atelier-panel" aria-labelledby="atelier-recipes-title">
+          <h3 id="atelier-recipes-title">Biblioteca de receitas</h3>
+          <p>Prepare o peso na aba Receita e os ingredientes na aba Matérias-primas. Salve com um nome. Ao recuperar, o sistema restaura quantidades, preços e rendimento daquela versão.</p>
+          <label class="atelier-field" for="atelierRecipeName">
+            <span>Nome da receita</span>
+            <input type="text" id="atelierRecipeName" maxlength="90" placeholder="Ex.: Lavanda — lote pequeno" autocomplete="off">
+          </label>
+          <button class="atelier-save" id="atelierSaveRecipe" type="button">Salvar receita atual</button>
+          <div class="atelier-subhead"><h3>Minhas receitas</h3><small id="atelierRecipeCount">0 / 40 receitas salvas</small></div>
+          <div class="atelier-library" id="atelierRecipeList" aria-live="polite"></div>
+        </section>
+        <section class="atelier-panel" aria-labelledby="atelier-batch-title">
+          <h3 id="atelier-batch-title">Assistente de produção</h3>
+          <p>Crie um planejamento com os dados atuais. Marque as verificações durante a produção e confirme quando realmente concluir.</p>
+          <label class="atelier-field" for="atelierBatchName">
+            <span>Identificação do lote</span>
+            <input type="text" id="atelierBatchName" maxlength="90" placeholder="Ex.: Lote Lavanda 01" autocomplete="off">
+          </label>
+          <label class="atelier-field" for="atelierBatchNotes">
+            <span>Observações (opcional)</span>
+            <textarea id="atelierBatchNotes" rows="3" maxlength="500" placeholder="Forma, fornecedores, perdas ou pendências..."></textarea>
+          </label>
+          <button class="atelier-save" id="atelierSaveBatch" type="button">Criar planejamento do lote</button>
+          <div class="atelier-subhead"><h3>Meus planejamentos</h3><small id="atelierBatchCount">0 / 100 registros</small></div>
+          <div class="atelier-library" id="atelierBatchList" aria-live="polite"></div>
+        </section>
+      </div>
+      <section class="atelier-backup" aria-labelledby="atelier-backup-title">
+        <h3 id="atelier-backup-title">Backup e restauração</h3>
+        <p>Exporte receitas, lotes e cadastro de preços para um arquivo JSON. Para usar em outro computador, importe o arquivo. Não há sincronização automática.</p>
+        <div class="atelier-backup-actions">
+          <button class="atelier-backup-button" type="button" id="atelierBackupDownload">Baixar backup</button>
+          <label class="atelier-upload-label" for="atelierBackupImport">Restaurar arquivo
+            <input type="file" id="atelierBackupImport" accept=".json,application/json">
+          </label>
+        </div>
+      </section>
+      <p id="atelierNotice" class="atelier-notice" role="status" aria-live="polite" hidden></p>
+      <p class="atelier-disclaimer">Dados locais podem ser perdidos se o armazenamento do navegador for limpo. Os lotes são declarados pelo usuário; não há baixa automática em estoque. As estimativas de peso não representam validação técnica, e preços históricos precisam ser conferidos antes de produzir ou vender.</p>
+    </section>
 
     <section class="card pricing-card module-screen" id="ingredientes" data-screen="ingredientes" aria-labelledby="ingredients-title">
       <h2 id="ingredients-title">Cadastro de matérias-primas</h2>
@@ -453,8 +503,9 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=8599876994e5a087bb8e72e3fa5dfbb14421ccba" defer></script>
+  <script src="pricing.js?v=1eb7118b96ee4bc6e84e57335af584203e2b00d9" defer></script>
   <script src="training.js?v=20261025-niveis2" defer></script>
-  <script src="app.js?v=20261025-curso2" defer></script>
+  <script src="atelier.js?v=20261025-atelier1" defer></script>
+  <script src="app.js?v=20261025-atelier1" defer></script>
 </body>
 </html>
