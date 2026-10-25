@@ -1,0 +1,56 @@
+/* Atelie: biblioteca local de receitas e planejamentos */
+.atelier-banner{background:linear-gradient(125deg,#173f2d,#2b7351);border-radius:16px;padding:23px;color:#fff;margin-bottom:21px}
+.atelier-banner h2{font-size:25px!important;color:#fff;margin:7px 0!important}
+.atelier-banner p{color:#d9e9df;font-size:13px;line-height:1.6;max-width:570px;margin:0}
+.atelier-eyebrow{text-transform:uppercase;letter-spacing:.09em;font-size:10px;font-weight:850;color:#b6e0c6}
+.atelier-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.atelier-panel{border:1px solid var(--stroke);border-radius:15px;padding:18px;background:#fbfdfb;min-width:0}
+.atelier-panel h3{font-size:18px;margin:0 0 6px}
+.atelier-panel>p{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 15px}
+.atelier-field{display:block;margin:0 0 10px}
+.atelier-field span{display:block;font-size:12px;font-weight:750;color:#395541;margin:0 0 6px}
+.atelier-field input,.atelier-field textarea{
+  display:block;width:100%;font:500 14px system-ui,sans-serif;color:var(--ink);
+  border:1px solid #c9dbc9;border-radius:10px;padding:12px;background:white;
+  resize:vertical;outline:none;
+}
+.atelier-field input:focus-visible,.atelier-field textarea:focus-visible{outline:3px solid #94c5a4}
+.atelier-panel button{font-family:inherit}
+.atelier-save{display:block;width:100%;padding:12px 14px;border:0;border-radius:10px;background:#235c3d;color:white;font-size:13px;font-weight:800;cursor:pointer}
+.atelier-save:hover{background:#17462e}
+.atelier-library{margin-top:14px;display:grid;gap:10px}
+.atelier-subhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:22px}
+.atelier-subhead h3{font-size:15px;margin:0}
+.atelier-subhead small{font-size:10px;font-weight:700;color:var(--muted)}
+.atelier-item{background:white;border:1px solid #dae6db;border-radius:12px;padding:12px;display:grid;gap:10px}
+.atelier-item-content{min-width:0;display:flex;flex-direction:column;gap:5px}
+.atelier-item-content strong{font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.atelier-item-content small{font-size:11px;color:var(--muted);line-height:1.45}
+.atelier-item-actions{display:flex;flex-wrap:wrap;gap:7px}
+.atelier-item-actions button{font-size:12px;padding:8px 10px;border-radius:9px;cursor:pointer;font-weight:700}
+.atelier-primary{background:#e6f3e8;border:1px solid #c2dec8;color:#1e5a3e}
+.atelier-subtle{background:white;border:1px solid var(--stroke);color:#62766a}
+.atelier-item-actions button:disabled{opacity:.45;cursor:not-allowed}
+.atelier-empty{font-size:12px;color:#728576;padding:14px;border:1px dashed #bdcfbf;border-radius:12px;line-height:1.6}
+.atelier-batch-status{align-self:start;font-size:10px;font-weight:850;border-radius:99px;padding:5px 9px;background:#e9f1fc;color:#325981}
+.atelier-batch-status[data-status="concluido"]{background:#e1f1e4;color:#276b3c}
+.atelier-mini{font-size:11px;line-height:1.55;color:#536b5b;margin:4px 0}
+.atelier-batch-notes{font-size:11px;color:#637465;line-height:1.5;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.atelier-checklist{display:grid;gap:7px;padding-top:10px;border-top:1px solid #e3ebe2}
+.atelier-check{display:flex;align-items:flex-start;gap:9px;font-size:12px;font-weight:550;line-height:1.45;cursor:pointer;margin:0}
+.atelier-check input{width:16px;height:16px;flex:none;accent-color:#256c47;padding:0;margin:2px 0 0}
+.atelier-backup{margin-top:19px;border:1px solid #cfe3d4;background:#f2f8f3;border-radius:14px;padding:18px}
+.atelier-backup h3{font-size:16px;margin:0 0 8px}
+.atelier-backup p{font-size:12px;line-height:1.6;color:#526d5c;margin:0 0 12px}
+.atelier-backup-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.atelier-backup-button,.atelier-upload-label{font-size:12px;font-weight:800;border-radius:10px;padding:11px 14px;cursor:pointer}
+.atelier-backup-button{border:1px solid #317b50;background:#256d46;color:white}
+.atelier-upload-label{border:1px solid #9ec4a8;background:white;color:#236240;margin:0}
+.atelier-upload-label input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.atelier-upload-label:focus-within{outline:3px solid #96c6a7}
+.atelier-notice{margin:12px 0 0;padding:12px 14px;background:#e8f4eb;border:1px solid #b9d4c2;color:#246441;font-size:12px;line-height:1.5;border-radius:10px}
+.atelier-notice.is-error{background:#fff6ea;border-color:#efd3a5;color:#8d5b2a}
+.atelier-notice[hidden]{display:none}
+.atelier-disclaimer{font-size:12px!important;line-height:1.6;color:#687768;padding:13px 14px;border:1px solid #e1e9dc;border-radius:11px;background:#fffdfa;margin-top:18px}
+@media(max-width:1130px){.atelier-layout{grid-template-columns:1fr}}
+@media(max-width:860px){.atelier-layout{grid-template-columns:1fr}}
