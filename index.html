@@ -74,7 +74,7 @@
     @media print { body { background:white; } .card { box-shadow:none; } }
   </style>
   <link rel="stylesheet" href="palette.css">
-  <link rel="stylesheet" href="pricing.css?v=c3dc864e16f27ee3ca985f67e57354837eddc270">
+  <link rel="stylesheet" href="pricing.css?v=2a4b5129ebb94502872408cd08b00d8d3f64b3c9">
 </head>
 <body>
   <main>
@@ -142,6 +142,11 @@
         </div>
         <p id="p_status" class="pricing-status" role="status">Complete os preços para ver o valor por sabonete.</p>
       </div>
+      <div class="p-lot-sale incomplete" id="p_lot_sale" aria-live="polite">
+        <span id="p_total_sale_label">Valor total de venda do lote</span>
+        <strong id="p_total_sale">—</strong>
+        <small id="p_total_sale_note">Preço por sabonete multiplicado pela quantidade produzida.</small>
+      </div>
       <div class="p-simple-info">
         <div class="p-simple-item">
           <span>Custo dos ingredientes por unidade</span>
@@ -155,16 +160,26 @@
       <p class="pricing-help" id="p_recipe_batch">Receita calculada acima.</p>
       <p class="pricing-help">O peso estimado por sabonete é <strong id="p_unit_weight">—</strong>. O preço considera o rendimento informado, não o peso de uma forma padrão.</p>
 
+      <div class="p-breakdown" aria-labelledby="p_breakdown_title">
+        <h3 id="p_breakdown_title">Valor individual de cada ingrediente</h3>
+        <p class="p-breakdown-caption">Quanto cada matéria-prima custa por sabonete e quanto foi gasto no lote inteiro. As quantidades são atualizadas pela receita acima.</p>
+        <div id="p_breakdown_rows" class="p-breakdown-list"></div>
+        <div class="p-breakdown-totals">
+          <div><span>Ingredientes por sabonete</span><strong id="p_breakdown_unit_total">—</strong></div>
+          <div><span>Ingredientes no lote</span><strong id="p_breakdown_lot_total">—</strong></div>
+        </div>
+      </div>
+      <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar novo produto ou matéria-prima</button>
+      <p class="p-materials-description">Inclua corantes, outra essência ou qualquer produto usado na fabricação. Informe a embalagem, o preço pago e quanto usou no lote.</p>
       <details class="p-prices-panel" id="p_materials">
         <summary>Editar preços e matérias-primas</summary>
         <p class="pricing-help">Altere os nomes, os valores e os tamanhos das embalagens. Para corantes ou essências adicionais, informe também quanto foi usado no lote.</p>
         <div id="p_products" class="p-products" aria-label="Matérias-primas e valores"></div>
-        <button id="p_add" class="p-add" type="button">+ Adicionar matéria-prima</button>
       </details>
       <p class="pricing-assumptions">O valor sugerido aplica o acréscimo informado sobre o custo das matérias-primas. Ele não representa lucro líquido: embalagem, mão de obra, taxas, perdas e impostos não são calculados separadamente. A fórmula e o peso final continuam estimados quando faltam as densidades dos líquidos.</p>
       <p class="p-notice">A fórmula volumétrica 8/7/10 foi fornecida por você e não é uma validação técnica para uso ou venda. Verifique os limites da base, da fragrância (IFRA categoria 9) e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
-      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-3</p>
+      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-4</p>
     </section>
 
     <section class="card color-card" id="cores" aria-labelledby="colorTitle">
@@ -285,6 +300,6 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=58ee9c22e960d41b7cf2b5b928f91c510c507b7d" defer></script>
+  <script src="pricing.js?v=3eeff52e29f67ad2e5572abfe9120a26064ae382" defer></script>
 </body>
 </html>
