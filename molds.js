@@ -71,6 +71,7 @@
       'Confira: cavidades de 1 a 1.000, peso positivo até 10.000 g por cavidade, preenchimentos de 1 a 500 e reserva de 0% a 30%. Limite de 100.000 peças e 1.000 kg por planejamento.';
     if(!valid){
       preview=null;
+      $('moldSummary').textContent='Aguardando informações válidas da forma.';
       for(const id of ['moldTotalUnits','moldFinishedMass','moldBaseMass','moldEssence','moldExtract','moldLauril'])
         $(id).textContent='—';
       return;
