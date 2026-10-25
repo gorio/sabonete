@@ -288,7 +288,9 @@
     if(ext && document.activeElement!==quickUnit)quickUnit.value=validPackUnit(ext.unit,ext.packUnit);
     const extQty=ext?packageAmount(ext):NaN;
     const suspiciousExt=ext&&positive(extQty)&&extQty<=1&&usedAmount(ext,base)>extQty;
-    byId('p_quick_missing').hidden=!ext || (positive(extQty)&&!suspiciousExt);
+    // Campo permanente: nunca recolher enquanto o usuario altera 1 -> 10 -> 100.
+    // Um valor temporariamente valido nao deve desmontar o proprio editor.
+    byId('p_quick_missing').hidden=!ext;
     output('p_ext_quick_note',suspiciousExt?
       'Atenção: informado '+ext.pack+' '+validPackUnit(ext.unit,ext.packUnit)+
       ' por '+money(numeric(ext.price))+'. Isso equivale a '+money(numeric(ext.price)/extQty)+
@@ -300,6 +302,17 @@
     const key=formFields[id],elem=byId(id);
     elem.value=state[key];
     elem.addEventListener('input',()=>{state[key]=elem.value;store();calculate();});
+  });
+  byId('p_ext_quick').addEventListener('focus',()=>{
+    const ext=state.products.find(p=>p.id==='ext');
+    if(!ext)return;
+    const currentAmount=packageAmount(ext);
+    const {base}=formula();
+    const seemsWrong=!positive(currentAmount) ||
+      (currentAmount<=1 && usedAmount(ext,base)>currentAmount);
+    if(seemsWrong && typeof byId('p_ext_quick').select==='function'){
+      byId('p_ext_quick').select();
+    }
   });
   byId('p_ext_quick').addEventListener('input',()=>{
     const ext=state.products.find(p=>p.id==='ext');
