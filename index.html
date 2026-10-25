@@ -74,7 +74,7 @@
     @media print { body { background:white; } .card { box-shadow:none; } }
   </style>
   <link rel="stylesheet" href="palette.css">
-  <link rel="stylesheet" href="pricing.css?v=3">
+  <link rel="stylesheet" href="pricing.css?v=4">
 </head>
 <body>
   <main>
@@ -131,18 +131,20 @@
       <p class="pricing-help" id="yield-note">Exemplo: se a receita de 260 g render 20 sabonetes, cada um terá peso teórico de 13 g.</p>
       <p class="pricing-help" id="markup-note">150% de <strong>acréscimo sobre o custo</strong> significa preço de venda = custo × 2,5. Não é margem de 150% sobre o valor vendido.</p>
       <p class="pricing-help" id="p_recipe_batch">Preços calculados usando a receita atual acima.</p>
+      <p id="p_status" class="pricing-status" role="status">Calculando custos dos ingredientes...</p>
+      <p id="p_action" class="pricing-help" hidden><a href="#p_ext_pack_input">Preencher volume da embalagem do extrato de Hamamélis</a> para completar o preço de venda.</p>
 
       <div class="pricing-overview" aria-live="polite">
-        <div class="pricing-metric"><span>Ingredientes do lote inteiro</span><strong id="p_batch_total">—</strong><span class="metric-small" id="p_partial_total"></span></div>
+        <div class="pricing-metric"><span id="p_batch_label">Ingredientes do lote inteiro</span><strong id="p_batch_total">—</strong><span class="metric-small" id="p_partial_total"></span></div>
         <div class="pricing-metric"><span>Peso estimado por sabonete</span><strong id="p_unit_weight">—</strong></div>
-        <div class="pricing-metric"><span>Ingredientes por sabonete</span><strong id="p_unit_raw">—</strong></div>
-        <div class="pricing-metric"><span>Custo dos ingredientes por sabonete</span><strong id="p_unit_cost">—</strong></div>
-        <div class="pricing-metric featured"><span>Preço de venda sugerido</span><strong id="p_suggested">—</strong></div>
-        <div class="pricing-metric featured"><span>Acréscimo bruto por sabonete</span><strong id="p_profit">—</strong></div>
+        <div class="pricing-metric"><span id="p_unit_raw_label">Ingredientes por sabonete</span><strong id="p_unit_raw">—</strong></div>
+        <div class="pricing-metric"><span id="p_unit_cost_label">Custo dos ingredientes por sabonete</span><strong id="p_unit_cost">—</strong></div>
+        <div class="pricing-metric featured"><span id="p_suggested_label">Preço de venda sugerido</span><strong id="p_suggested">—</strong></div>
+        <div class="pricing-metric featured"><span id="p_profit_label">Acréscimo bruto por sabonete</span><strong id="p_profit">—</strong></div>
         
-        <div class="pricing-metric"><span>Margem bruta teórica sobre venda</span><strong id="p_margin">—</strong></div>
+        <div class="pricing-metric"><span id="p_margin_label">Margem bruta teórica sobre venda</span><strong id="p_margin">—</strong></div>
       </div>
-      <p class="p-summary">Acréscimo bruto estimado do lote: <strong id="p_lot_profit">—</strong></p>
+      <p class="p-summary" id="p_lot_profit_row">Acréscimo bruto estimado do lote: <strong id="p_lot_profit">—</strong></p>
 
       <hr class="pricing-hr">
       <h3>Matérias-primas</h3>
@@ -153,8 +155,8 @@
 
 
 
-      <p id="p_status" class="pricing-status" role="status">Preencha os dados das embalagens para concluir a conta.</p>
-      <p class="pricing-assumptions" id="p_sale_note">O preço sugerido usa somente os ingredientes cadastrados. O acréscimo de 150% é uma reserva comercial para despesas e lucro, não lucro líquido comprovado.</p>
+      
+      <p class="pricing-assumptions" id="p_sale_note">Enquanto faltar algum dado, a plataforma mostra os custos conhecidos, claramente identificados como parciais.</p>
       <p class="pricing-assumptions">O preço considera o custo dos ingredientes, dividido pelas unidades produzidas, e o acréscimo sobre o custo que você escolher. Embalagens, trabalho, energia, impostos, taxas e perdas não são apurados separadamente nesta versão. O peso por unidade continua estimado enquanto faltarem as densidades dos líquidos (hipótese de 1 g/mL). Ingredientes adicionais entram no custo, mas não alteram automaticamente o peso da receita original.</p>
       <p class="p-notice">A fórmula 8/7/10 é um registro das quantidades informadas, não uma recomendação de segurança para fabricação e venda. Confira capacidade de aditivos da base, IFRA categoria 9 da essência e compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Preços e produtos editados ficam salvos apenas neste navegador. A calculadora não sincroniza valores entre dispositivos.</p>
@@ -278,6 +280,6 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=3" defer></script>
+  <script src="pricing.js?v=4" defer></script>
 </body>
 </html>
