@@ -59,6 +59,7 @@
       const ok=nonZero(pack) && valid(price);
       const used=base*item.factor;
       const unitUsed=unitBase*item.factor;
+      out('p_'+item.key+'_amount','Uso: '+(Number.isFinite(used)?fmtBR.format(used)+(item.key==='base'?' g':' mL'):'—'));
       if(!ok){
         missing.push(item.key);
         out(item.cost,'—');
