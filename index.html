@@ -74,7 +74,7 @@
     @media print { body { background:white; } .card { box-shadow:none; } }
   </style>
   <link rel="stylesheet" href="palette.css">
-  <link rel="stylesheet" href="pricing.css?v=9568833e7aa01edf73e7cfcd4b3eb2f1b18afff8">
+  <link rel="stylesheet" href="pricing.css?v=6eb504df9cb140b084af4d531d3c7419633f50dd">
 </head>
 <body>
   <main>
@@ -173,17 +173,17 @@
           <div><span>Ingredientes no lote</span><strong id="p_breakdown_lot_total">—</strong></div>
         </div>
       </div>
-      <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar novo produto ou matéria-prima</button>
-      <p class="p-materials-description">Inclua corantes, outra essência ou qualquer produto usado na fabricação. Informe a embalagem, o preço pago e quanto usou no lote.</p>
+      <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar ingrediente ou produto</button>
+      <p class="p-materials-description">Cadastre essência, corante, óleo vegetal, extrato ou outro ingrediente. Preencha o <strong>nome</strong>, o <strong>tamanho e preço da embalagem</strong> e a <strong>quantidade utilizada neste lote</strong>. Escolha g/kg para peso ou mL/L para volume. O custo será incluído automaticamente no valor por sabonete e no total do lote.</p>
       <details class="p-prices-panel" id="p_materials">
         <summary>Editar preços e matérias-primas</summary>
-        <p class="pricing-help">Altere os nomes, os valores e os tamanhos das embalagens. Para corantes ou essências adicionais, informe também quanto foi usado no lote.</p>
+        <p class="pricing-help">Para cada produto adicional: selecione o tipo (volume, peso ou unidade), a quantidade comprada e sua unidade, o preço pago, além da quantidade usada e sua unidade. Exemplo: frasco de 1 L por R$ 26,00, consumo de 15 mL. Os dados ficam salvos neste navegador.</p>
         <div id="p_products" class="p-products" aria-label="Matérias-primas e valores"></div>
       </details>
-      <p class="pricing-assumptions">O valor sugerido aplica o acréscimo informado sobre o custo das matérias-primas. Ele não representa lucro líquido: embalagem, mão de obra, taxas, perdas e impostos não são calculados separadamente. A fórmula e o peso final continuam estimados quando faltam as densidades dos líquidos.</p>
+      <p class="pricing-assumptions">Produtos adicionais entram no <strong>custo</strong> usando a quantidade informada no lote. Não mudam automaticamente o peso final teórico da receita: para isso, seriam necessárias as densidades e a fórmula completa. O acréscimo comercial não equivale a lucro líquido, pois despesas indiretas não estão detalhadas.</p>
       <p class="p-notice">A fórmula volumétrica 8/7/10 foi fornecida por você e não é uma validação técnica para uso ou venda. Verifique os limites da base, da fragrância (IFRA categoria 9) e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
-      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-6</p>
+      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-7</p>
     </section>
 
     <section class="card color-card" id="cores" aria-labelledby="colorTitle">
@@ -304,6 +304,6 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=1cef17b4a8374239f82a53b5eedafa231171cf7f" defer></script>
+  <script src="pricing.js?v=72eb449763556b979a550a876d062fa4db436e47" defer></script>
 </body>
 </html>
