@@ -83,77 +83,148 @@
       ]
     }
   ];
-  const flatten = modules.flatMap((module,mi)=>module.lessons.map((lesson,li)=>({...lesson,moduleIndex:mi,lessonIndex:li,moduleTitle:module.title})));
-  const $ = id => document.getElementById(id);
+
+  const advancedModules=[
+    {title:'Organização e rastreabilidade',subtitle:'Controle lotes, perdas e matérias-primas.',lessons:[
+      {id:'a14',title:'Planejamento de produção e capacidade',minutes:12,
+        goal:'Organizar volumes de produção, moldes, tempo e rendimento sem depender de estimativas soltas.',
+        topics:['Capacidade de formas e planejamento de lotes','Rendimento real versus previsto','Checklist de separação e produção'],
+        task:'Monte um planejamento de três lotes com insumos e rendimentos esperados.',tool:'receita'},
+      {id:'a15',title:'Estoque e rastreabilidade de insumos',minutes:13,
+        goal:'Criar um método simples para registrar entradas, consumo e origem dos insumos.',
+        topics:['Identificação do fornecedor, lote e validade quando aplicável','Entradas, saídas e conferências','Separação de produtos pendentes de avaliação'],
+        task:'Monte uma planilha ou ficha de rastreabilidade para uma produção real.',tool:'ingredientes'}
+    ]},
+    {title:'Portfólio, encomendas e operação',subtitle:'Estruture preços e fluxo de trabalho para vender com consistência.',lessons:[
+      {id:'a16',title:'Preço para kits, encomendas e atacado',minutes:14,
+        goal:'Comparar cenários comerciais e entender o efeito de descontos na margem de contribuição.',
+        topics:['Composição de kits e consumo real','Desconto versus preço mínimo e custos indiretos','Diferença entre markup, margem bruta e lucro líquido'],
+        task:'Compare preço unitário com um kit e uma encomenda, sem vender abaixo dos custos conhecidos.',tool:'venda'},
+      {id:'a17',title:'Controle de pedidos, produção e entregas',minutes:12,
+        goal:'Desenhar um processo de pedidos com registro de quantidade, prazo e revisão de estoque.',
+        topics:['Pedido confirmado e programação de lote','Registro de perdas, retrabalho e entregas','Como documentar ajustes entre previsão e resultado'],
+        task:'Crie um fluxo simples do pedido à entrega para um lote de sabonetes.',tool:'venda'},
+      {id:'a18',title:'Plano de operação e evolução do negócio',minutes:15,
+        goal:'Consolidar um processo de produção repetível e um plano para aprimorar custos e qualidade.',
+        topics:['Indicadores de custo, rendimento e desperdício','Rotina de revisão de fornecedores e fichas técnicas','Planejamento de melhorias e questões regulatórias pendentes'],
+        task:'Escreva um plano de 30 dias com metas de produção, revisão de custos e documentação.',tool:'venda'}
+    ]}
+  ];
+  const tracks=[
+    {id:'basico',name:'Básico',tagline:'Comece com confiança',
+      outcome:'Domine as etapas essenciais, medições e planejamento do primeiro lote.',
+      modules:[
+        modules[0],
+        {title:'Primeiros cálculos',subtitle:'Faça contas sem confundir peso e volume.',lessons:modules[1].lessons.slice(0,2)}
+      ]},
+    {id:'intermediario',name:'Intermediário',tagline:'Produza com consistência',
+      outcome:'Trabalhe aditivos, cores, moldes e custos com mais controle.',
+      modules:[
+        {title:'Ingredientes e técnicas',subtitle:'Aditivos, derretimento, cores e moldagem.',lessons:[
+          modules[1].lessons[2],...modules[2].lessons
+        ]},
+        modules[3]
+      ]},
+    {id:'avancado',name:'Avançado',tagline:'Estruture o negócio artesanal',
+      outcome:'Organize lotes, rastreabilidade, estoque, kits, encomendas e operação.',
+      modules:[modules[4],...advancedModules]
+    }
+  ];
+  const byTrack=Object.fromEntries(tracks.map(track=>[
+    track.id,track.modules.flatMap((module,mi)=>module.lessons.map((lesson,li)=>({
+      ...lesson,moduleIndex:mi,lessonIndex:li,moduleTitle:module.title,trackId:track.id
+    })))
+  ]));
+  const allLessons=tracks.flatMap(track=>byTrack[track.id]);
+  const ids=new Set(allLessons.map(l=>l.id));
+  const $=id=>document.getElementById(id);
   if(!$('courseLessons')||!$('courseLessonTitle')||!$('courseVideo'))return;
   const key='sabonete-treinamento-v1';
-  const validIds = new Set(flatten.map(l=>l.id));
-  let done=new Set();
-  let active=flatten[0].id;
-  try{
+  let completed=new Set();
+  let activeTrack='basico';
+  let activeLesson=byTrack.basico[0].id;
+  try {
     const data=JSON.parse(localStorage.getItem(key)||'null');
-    if(data&&Array.isArray(data.completed)){
-      done=new Set(data.completed.filter(id=>validIds.has(id)));
+    if(data && Array.isArray(data.completed))
+      completed=new Set(data.completed.filter(id=>ids.has(id)));
+    if(data && typeof data.selected==='string' && ids.has(data.selected)){
+      activeLesson=data.selected;
+      activeTrack=allLessons.find(l=>l.id===data.selected).trackId;
     }
-    if(data&&validIds.has(data.selected))active=data.selected;
+    if(data && tracks.some(t=>t.id===data.track)){
+      activeTrack=data.track;
+      if(!byTrack[activeTrack].some(l=>l.id===activeLesson))
+        activeLesson=byTrack[activeTrack][0].id;
+    }
   }catch(_){}
+
   const el=(tag,cls,text)=>{
     const node=document.createElement(tag);
     if(cls)node.className=cls;
     if(text!==undefined)node.textContent=text;
     return node;
   };
-  const totalMinutes=flatten.reduce((s,l)=>s+l.minutes,0);
-  $('courseCount').textContent=flatten.length+' aulas planejadas';
-  $('courseDuration').textContent='~'+Math.round(totalMinutes/5)*5+' min de conteúdo previsto';
   const list=$('courseLessons');
+  const productButtons=Array.from(document.querySelectorAll('[data-track-select]'));
+  const totalMinutes=allLessons.reduce((sum,l)=>sum+l.minutes,0);
+  $('courseCount').textContent=allLessons.length+' aulas planejadas em 3 níveis';
+  $('courseDuration').textContent='~'+Math.round(totalMinutes/5)*5+' min previstos no total';
 
   function save(){
-    try{localStorage.setItem(key,JSON.stringify({completed:[...done],selected:active}))}catch(_){}
+    try{localStorage.setItem(key,JSON.stringify({
+      completed:[...completed],selected:activeLesson,track:activeTrack
+    }))}catch(_){}
   }
   function updateProgress(){
-    const n=done.size,total=flatten.length;
-    $('courseProgress').value=n;
-    $('courseProgress').max=total;
-    $('courseProgressText').textContent=n+' de '+total+' atividades marcadas';
-    $('courseProgressPercent').textContent=Math.round(n/total*100)+'%';
+    const units=byTrack[activeTrack];
+    const done=units.filter(l=>completed.has(l.id)).length;
+    $('courseProgress').value=done;
+    $('courseProgress').max=units.length;
+    $('courseProgressText').textContent=done+' de '+units.length+' atividades marcadas neste nível';
+    $('courseProgressPercent').textContent=Math.round(done/units.length*100)+'%';
+  }
+  function paintProducts(){
+    productButtons.forEach(btn=>{
+      const active=btn.dataset.trackSelect===activeTrack;
+      btn.setAttribute('aria-pressed',String(active));
+      btn.textContent=active?'Visualizando '+tracks.find(t=>t.id===activeTrack).name:'Ver programa';
+    });
   }
   function makeList(){
     list.replaceChildren();
-    modules.forEach((m,mi)=>{
+    const t=tracks.find(x=>x.id===activeTrack);
+    $('courseSelectedName').textContent='Aulas do nível '+t.name;
+    t.modules.forEach((module,mi)=>{
       const wrapper=el('section','course-module');
-      const title=el('h3','course-module-title',(mi+1)+'. '+m.title);
-      const desc=el('p','course-module-desc',m.subtitle);
-      wrapper.append(title,desc);
+      wrapper.append(el('h3','course-module-title',(mi+1)+'. '+module.title));
+      wrapper.append(el('p','course-module-desc',module.subtitle));
       const group=el('div','course-module-items');
-      m.lessons.forEach((lesson,li)=>{
+      module.lessons.forEach(lesson=>{
+        const index=byTrack[activeTrack].findIndex(l=>l.id===lesson.id);
         const b=el('button','course-lesson-button');
         b.type='button';
         b.dataset.lessonId=lesson.id;
-        const number=el('span','course-lesson-number',String(flatten.findIndex(l=>l.id===lesson.id)+1).padStart(2,'0'));
+        const number=el('span','course-lesson-number',String(index+1).padStart(2,'0'));
         const text=el('span','course-lesson-button-text');
         text.append(el('strong','',lesson.title),el('small','','~'+lesson.minutes+' min previstos'));
-        const completed=el('span','course-lesson-check',done.has(lesson.id)?'✓':'○');
-        completed.setAttribute('aria-hidden','true');
-        b.append(number,text,completed);
-        b.setAttribute('aria-pressed',String(lesson.id===active));
-        b.addEventListener('click',()=>show(lesson.id,true));
+        const check=el('span','course-lesson-check',completed.has(lesson.id)?'✓':'○');
+        check.setAttribute('aria-hidden','true');
+        b.append(number,text,check);
+        b.setAttribute('aria-pressed',String(lesson.id===activeLesson));
+        b.addEventListener('click',()=>showLesson(lesson.id,true));
         group.append(b);
       });
       wrapper.append(group);
       list.append(wrapper);
     });
   }
-  function drawTopics(items){
-    const list=$('courseLessonTopics');
-    list.replaceChildren();
-    items.forEach(t=>list.append(el('li','',t)));
-  }
   function drawVideo(lesson){
-    const video=$('courseVideo');
-    video.replaceChildren();
-    // Somente vídeos reais inseridos pelo editor do site são publicados.
-    if(typeof lesson.youtubeId==='string'&&/^[A-Za-z0-9_-]{11}$/.test(lesson.youtubeId)){
+    const holder=$('courseVideo');
+    holder.replaceChildren();
+    // Public GitHub Pages does not offer protected paid video access.
+    // Only videos deliberately flagged as public previews may be embedded.
+    if(lesson.isPublicPreview===true &&
+       typeof lesson.youtubeId==='string' && /^[A-Za-z0-9_-]{11}$/.test(lesson.youtubeId)){
       const iframe=document.createElement('iframe');
       iframe.src='https://www.youtube-nocookie.com/embed/'+lesson.youtubeId;
       iframe.title='Vídeo-aula: '+lesson.title;
@@ -161,54 +232,91 @@
       iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
       iframe.allowFullscreen=true;
       iframe.referrerPolicy='strict-origin-when-cross-origin';
-      video.append(iframe);
-      $('courseVideoState').textContent='Vídeo-aula disponível';
+      holder.append(iframe);
+      $('courseVideoState').textContent='Amostra gratuita em vídeo';
     } else {
       const placeholder=el('div','course-video-placeholder');
-      placeholder.append(el('span','course-play-icon','▶'),
+      placeholder.append(
+        el('span','course-play-icon','▶'),
         el('strong','','Vídeo-aula em preparação'),
-        el('span','','O roteiro e a atividade já estão disponíveis. O vídeo será exibido aqui quando for publicado.'));
-      video.append(placeholder);
+        el('span','','Este é o programa planejado. A aula será publicada quando o conteúdo e o acesso forem configurados.')
+      );
+      holder.append(placeholder);
       $('courseVideoState').textContent='Vídeo ainda não publicado';
     }
   }
-  function show(id,scroll){
-    const selected=flatten.find(l=>l.id===id);
-    if(!selected)return;
-    active=id;
-    const position=flatten.indexOf(selected);
-    $('courseLessonNumber').textContent='Módulo '+(selected.moduleIndex+1)+' · Aula '+(position+1)+' de '+flatten.length;
-    $('courseLessonTitle').textContent=selected.title;
-    $('courseLessonGoal').textContent=selected.goal;
-    $('courseLessonTask').textContent=selected.task;
-    $('courseLessonDuration').textContent='Duração planejada: '+selected.minutes+' min';
-    drawTopics(selected.topics);
-    drawVideo(selected);
-    $('courseToolLink').href='#'+selected.tool;
+  function paintUpsell(){
+    const idx=tracks.findIndex(t=>t.id===activeTrack);
+    const next=tracks[idx+1];
+    const area=$('courseUpsell');
+    area.hidden=!next;
+    if(!next)return;
+    $('courseUpsellTitle').textContent='Seu próximo passo: '+next.name;
+    $('courseUpsellText').textContent=next.outcome+' Consulte o programa do próximo treinamento.';
+    $('courseUpsellButton').textContent='Conhecer o '+next.name;
+  }
+  function showLesson(id,scroll){
+    const lesson=byTrack[activeTrack].find(l=>l.id===id);
+    if(!lesson)return;
+    activeLesson=id;
+    const lessons=byTrack[activeTrack],idx=lessons.findIndex(l=>l.id===id);
+    const track=tracks.find(t=>t.id===activeTrack);
+    $('courseLessonNumber').textContent=track.name+' · Módulo '+(lesson.moduleIndex+1)+' · Aula '+(idx+1)+' de '+lessons.length;
+    $('courseLessonTitle').textContent=lesson.title;
+    $('courseLessonGoal').textContent=lesson.goal;
+    $('courseLessonTask').textContent=lesson.task;
+    $('courseLessonDuration').textContent='Duração planejada: '+lesson.minutes+' min';
+    const topics=$('courseLessonTopics');
+    topics.replaceChildren(...lesson.topics.map(t=>el('li','',t)));
+    drawVideo(lesson);
+    $('courseToolLink').href='#'+lesson.tool;
     const tools={receita:'Abrir calculadora de receita',ingredientes:'Abrir matérias-primas',
       venda:'Abrir preço de venda',cores:'Abrir misturador de cores',temperaturas:'Abrir temperaturas'};
-    $('courseToolLink').textContent=tools[selected.tool]||'Abrir ferramenta';
-    $('courseComplete').setAttribute('aria-pressed',String(done.has(id)));
-    $('courseComplete').textContent=done.has(id)?'✓ Atividade marcada como concluída':'Marcar atividade como concluída';
-    $('coursePrev').disabled=position===0;
-    $('courseNext').disabled=position===flatten.length-1;
-    for(const button of list.querySelectorAll('[data-lesson-id]')){
-      const chosen=button.dataset.lessonId===id;
-      button.setAttribute('aria-pressed',String(chosen));
-      button.querySelector('.course-lesson-check').textContent=done.has(button.dataset.lessonId)?'✓':'○';
+    $('courseToolLink').textContent=tools[lesson.tool]||'Abrir ferramenta';
+    $('courseComplete').setAttribute('aria-pressed',String(completed.has(id)));
+    $('courseComplete').textContent=completed.has(id)?
+      '✓ Atividade marcada como concluída':'Marcar atividade como concluída';
+    $('coursePrev').disabled=idx===0;
+    $('courseNext').disabled=idx===lessons.length-1;
+    for(const btn of list.querySelectorAll('[data-lesson-id]')){
+      const selected=btn.dataset.lessonId===id;
+      btn.setAttribute('aria-pressed',String(selected));
+      const tick=btn.querySelector('.course-lesson-check');
+      if(tick)tick.textContent=completed.has(btn.dataset.lessonId)?'✓':'○';
     }
     save();
-    if(scroll){
-      // Keep selection and player visible after choosing a lesson on mobile.
+    if(scroll)
       $('courseLessonDetails').scrollIntoView({block:'start',behavior:'smooth'});
-    }
   }
-  $('courseComplete').addEventListener('click',()=>{
-    if(done.has(active))done.delete(active); else done.add(active);
+  function selectTrack(id,scroll){
+    if(!byTrack[id])return;
+    activeTrack=id;
+    activeLesson=byTrack[id].some(l=>l.id===activeLesson)?activeLesson:byTrack[id][0].id;
+    paintProducts();
+    makeList();
     updateProgress();
-    show(active,false);
+    paintUpsell();
+    showLesson(activeLesson,false);
+    if(scroll)$('courseCatalog').scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  productButtons.forEach(btn=>btn.addEventListener('click',()=>selectTrack(btn.dataset.trackSelect,true)));
+  $('courseUpsellButton').addEventListener('click',()=>{
+    const idx=tracks.findIndex(t=>t.id===activeTrack);
+    if(tracks[idx+1])selectTrack(tracks[idx+1].id,true);
   });
-  $('coursePrev').addEventListener('click',()=>{const i=flatten.findIndex(l=>l.id===active);if(i>0)show(flatten[i-1].id,true)});
-  $('courseNext').addEventListener('click',()=>{const i=flatten.findIndex(l=>l.id===active);if(i>=0&&i<flatten.length-1)show(flatten[i+1].id,true)});
-  makeList();updateProgress();show(active,false);
+  $('courseComplete').addEventListener('click',()=>{
+    if(completed.has(activeLesson))completed.delete(activeLesson);
+    else completed.add(activeLesson);
+    updateProgress();
+    showLesson(activeLesson,false);
+  });
+  $('coursePrev').addEventListener('click',()=>{
+    const lessons=byTrack[activeTrack],idx=lessons.findIndex(l=>l.id===activeLesson);
+    if(idx>0)showLesson(lessons[idx-1].id,true);
+  });
+  $('courseNext').addEventListener('click',()=>{
+    const lessons=byTrack[activeTrack],idx=lessons.findIndex(l=>l.id===activeLesson);
+    if(idx>=0&&idx<lessons.length-1)showLesson(lessons[idx+1].id,true);
+  });
+  selectTrack(activeTrack,false);
 })();
