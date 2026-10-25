@@ -1,0 +1,170 @@
+/* Layout público modular – Sabonete Vegetal */
+:root{
+  --app-bg:#f3f6f2;
+  --app-teal:#174d36;
+  --app-teal-2:#286b4c;
+  --app-paper:#fff;
+  --app-warm:#f8faf7;
+  --app-border:#dfe9df;
+}
+body{
+  min-height:100vh;
+  background:radial-gradient(ellipse 700px 350px at 95% -80px,#dfefe3 0%,transparent 85%),var(--app-bg);
+}
+.app-shell{
+  display:grid;
+  grid-template-columns:236px minmax(0,1fr);
+  align-items:start;
+  gap:26px;
+  width:min(1180px,calc(100% - 48px));
+  margin:0 auto;
+  padding:28px 0 48px;
+}
+.app-sidebar{
+  position:sticky;
+  top:22px;
+  border:1px solid var(--app-border);
+  background:rgba(255,255,255,.92);
+  border-radius:22px;
+  padding:22px 15px 18px;
+  box-shadow:0 12px 36px #244b3008;
+}
+.app-brand{display:flex;align-items:center;gap:12px;padding:3px 7px 22px}
+.app-brand-mark{
+  display:grid;place-items:center;flex:none;
+  width:44px;height:44px;border-radius:14px;
+  background:#e0f2e4;color:var(--app-teal);
+  font-size:25px;
+}
+.app-brand strong{font-size:16px;font-weight:850;color:var(--ink);display:block;line-height:1.2;letter-spacing:-.025em}
+.app-brand small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.app-nav-title{text-transform:uppercase;letter-spacing:.09em;color:#7c9180;font-size:10px;font-weight:850;padding:0 13px;margin:6px 0 11px}
+.module-nav{display:flex;flex-direction:column;gap:5px}
+.module-link{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 12px;
+  color:#536a5c;text-decoration:none;
+  font-size:14px;font-weight:700;
+  border-radius:12px;
+  min-height:49px;
+  border:1px solid transparent;
+  transition:background .15s ease,color .15s ease;
+}
+.module-link:hover{background:#f0f6f0;color:var(--app-teal)}
+.module-link:focus-visible{outline:3px solid #95c8aa;outline-offset:2px}
+.module-link[aria-current="page"]{
+  background:#e8f3eb;
+  border-color:#cfe5d4;
+  color:var(--app-teal);
+  font-weight:850;
+}
+.module-icon{font-size:18px;line-height:1;display:inline-grid;place-items:center;width:24px;flex:none}
+.sidebar-note{margin:24px 7px 0;padding:13px 12px;background:#f2f7f2;border-radius:12px;color:#66806d;font-size:12px;line-height:1.6}
+.app-stage{min-width:0}
+.app-topbar{padding:9px 4px 22px}
+.app-kicker{color:var(--app-teal-2);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.13em}
+.app-topbar h1{
+  font-size:clamp(30px,4.4vw,42px);
+  margin:8px 0 9px;
+  line-height:1.08;
+  letter-spacing:-.045em;
+}
+.app-topbar p{color:var(--muted);font-size:15px;line-height:1.65;margin:0;max-width:690px}
+.app-content{width:auto;max-width:none;margin:0}
+.app-content>.card{margin:0;box-shadow:0 13px 46px #2549330a;border:1px solid var(--app-border);border-radius:22px;padding:28px 32px}
+.app-content>.card h2{font-size:22px;margin-bottom:12px}
+.app-content .p-product-row{background:#fbfdfb}
+.app-content .pricing-card .p-step-heading:first-of-type{margin-top:15px}
+.module-screen[hidden]{display:none!important}
+.module-head{margin-bottom:19px}
+.module-head h2{font-size:22px;margin:0 0 6px}
+.module-head p{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
+.app-inline-link{color:var(--app-teal);font-weight:750;text-decoration:underline;text-underline-offset:3px}
+.app-inline-link:focus-visible{outline:3px solid #95c8aa}
+.app-shortcuts{margin:0 0 18px;padding:13px 15px;border:1px solid var(--app-border);border-radius:12px;background:#f6faf6;color:var(--muted);font-size:13px;line-height:1.55}
+.app-footer{margin-top:18px;padding:6px 8px;color:#617566;font-size:12px;line-height:1.65}
+.app-footer strong{color:var(--ink)}
+/* Pricing navigation is separated from purchasing input */
+.pricing-card .p-step-divider{margin-top:16px;padding-top:16px}
+.pricing-card .pricing-status{margin:15px 0 0}
+.pricing-card .p-prices-panel{display:none}
+.pricing-card .p-products{gap:12px}
+/* Summary field grouped apart from raw ingredients */
+#venda .p-sale-hero{margin-top:18px}
+#venda .p-breakdown{margin-top:26px}
+#ingredientes .p-step-heading{margin-top:10px}
+#ingredientes .p-product-row{padding:16px}
+#ingredientes .p-materials-description{margin:11px 0;font-size:13px}
+#ingredientes .p-add{margin-top:16px}
+/* These sections no longer sit in one very long scrolling page */
+#cores.color-card,#temperaturas.temp-section{margin-top:0}
+@media(min-width:1060px){
+  .app-content>.card{padding:34px 38px}
+  #ingredientes .p-products{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #ingredientes .p-product-row{min-width:0}
+  #ingredientes .p-product-row .p-product-header{flex-wrap:wrap}
+  #ingredientes .p-product-row .p-auto{white-space:normal}
+}
+@media(max-width:860px){
+  .app-shell{
+    display:block;width:min(100% - 28px,720px);
+    padding:12px 0 36px;
+  }
+  .app-sidebar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    border-radius:0 0 16px 16px;
+    margin:0 -6px 16px;
+    padding:11px 11px 10px;
+    background:rgba(252,254,251,.97);
+    box-shadow:0 10px 22px #1a4d2d0c;
+  }
+  .app-brand{padding:0 5px 9px;gap:9px}
+  .app-brand-mark{width:32px;height:32px;border-radius:10px;font-size:19px}
+  .app-brand strong{font-size:14px}
+  .app-brand small{display:none}
+  .app-nav-title,.sidebar-note{display:none}
+  .module-nav{
+    flex-direction:row;
+    overflow-x:auto;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+    padding:1px 3px 4px;
+    gap:5px;
+  }
+  .module-nav::-webkit-scrollbar{display:none}
+  .module-link{
+    flex:0 0 auto;
+    scroll-snap-align:start;
+    padding:10px 11px;
+    font-size:12px;
+    gap:6px;
+    min-height:39px;
+    border-radius:10px;
+    white-space:nowrap;
+  }
+  .module-icon{font-size:15px;width:18px}
+  .app-topbar{padding:8px 6px 19px}
+  .app-topbar h1{font-size:30px;margin-top:5px}
+  .app-topbar p{font-size:13px}
+  .app-content>.card{padding:20px 18px;border-radius:17px}
+}
+@media(max-width:490px){
+ .app-shell{width:calc(100% - 18px)}
+ .app-topbar h1{font-size:27px}
+ .app-content>.card{padding:18px 14px}
+ .module-link{font-size:12px}
+ .app-topbar p{line-height:1.5}
+ .module-head h2{font-size:20px}
+}
+@media(prefers-reduced-motion:reduce){
+ .module-link{transition:none}
+}
+@media print{
+ .app-shell{display:block;width:100%;padding:0}
+ .app-sidebar{display:none}
+ .app-content>.card{box-shadow:none}
+ .app-footer{display:none}
+ .module-screen[hidden]{display:block!important}
+}
