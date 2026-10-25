@@ -113,65 +113,72 @@
 
 
 
+
     <section class="card pricing-card" id="venda" aria-labelledby="pricing-title">
       <h2 id="pricing-title">Custo e preço de venda</h2>
-      <p class="pricing-lead">Informe quanto pagou e o tamanho de cada embalagem. A calculadora usa automaticamente a receita informada acima para calcular o custo dos ingredientes.</p>
-      <h3>Preço dos ingredientes</h3>
-      <p class="pricing-help" id="p_recipe_batch">Valores calculados para a receita atual.</p>
-      <div class="price-scroller">
-        <table class="price-table" aria-label="Preços e embalagens dos produtos">
-          <thead><tr><th>Produto</th><th>Embalagem</th><th>Preço pago</th><th>Custo no lote</th></tr></thead>
-          <tbody>
-            <tr><td><span class="product-name">Base vegetal</span><span class="product-sub">V&amp;G / Quimiz · g</span><span class="product-sub" id="p_base_amount">Uso: —</span></td>
-              <td><label class="input-label" for="p_base_qty">Peso da embalagem de base em gramas</label><input id="p_base_qty" type="text" inputmode="decimal" value="3000" aria-label="Embalagem de base, gramas"></td>
-              <td><label class="input-label" for="p_base_price">Preço da embalagem de base em reais</label><input id="p_base_price" type="text" inputmode="decimal" value="78,89" aria-label="Preço da base, reais"></td>
-              <td id="p_base_used">—</td></tr>
-            <tr><td><span class="product-name">Essência</span><span class="product-sub">Capim-Limão · mL</span><span class="product-sub" id="p_ess_amount">Uso: —</span></td>
-              <td><input id="p_ess_qty" type="text" inputmode="decimal" value="100" aria-label="Volume do frasco de essência, mililitros"></td>
-              <td><input id="p_ess_price" type="text" inputmode="decimal" value="26,60" aria-label="Preço da essência, reais"></td>
-              <td id="p_ess_used">—</td></tr>
-            <tr><td><span class="product-name">Extrato glicólico</span><span class="product-sub">Hamamélis · mL</span><span class="product-sub" id="p_ext_amount">Uso: —</span></td>
-              <td><input id="p_ext_qty" type="text" inputmode="decimal" placeholder="mL?" aria-label="Volume do frasco de extrato de Hamamélis, mililitros, obrigatório para custo total"></td>
-              <td><input id="p_ext_price" type="text" inputmode="decimal" value="12,00" aria-label="Preço do extrato de Hamamélis, reais"></td>
-              <td id="p_ext_used">—</td></tr>
-            <tr><td><span class="product-name">Lauril 27%</span><span class="product-sub">SLES · mL</span><span class="product-sub" id="p_lau_amount">Uso: —</span></td>
-              <td><input id="p_lau_qty" type="text" inputmode="decimal" value="1000" aria-label="Volume da embalagem de lauril, mililitros"></td>
-              <td><input id="p_lau_price" type="text" inputmode="decimal" value="26,00" aria-label="Preço do lauril, reais"></td>
-              <td id="p_lau_used">—</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <h3>Seu sabonete para venda</h3>
+      <p class="pricing-lead">Calcule quanto custa cada sabonete com base na <strong>quantidade real de peças produzidas</strong> e encontre o preço de venda automaticamente.</p>
+
       <div class="pricing-fields">
         <div class="pricing-field">
-          <label for="p_bar_weight">Peso por sabonete (g)</label>
-          <input id="p_bar_weight" value="100" type="text" inputmode="decimal">
+          <label for="p_units">Quantos sabonetes o lote rendeu?</label>
+          <input id="p_units" type="text" inputmode="numeric" value="20" autocomplete="off" aria-describedby="yield-note">
         </div>
         <div class="pricing-field">
-          <label for="p_sale">Preço de venda por sabonete (R$)</label>
-          <input id="p_sale" type="text" inputmode="decimal" placeholder="Ex.: 12,00">
+          <label for="p_markup_input">Lucro sobre o custo (%)</label>
+          <input id="p_markup_input" type="text" inputmode="decimal" value="150" autocomplete="off" aria-describedby="markup-note">
         </div>
       </div>
-      <details class="pricing-details">
-        <summary>Embalagem, mão de obra e taxas (opcional)</summary>
-        <div class="pricing-fields">
-          <div class="pricing-field"><label for="p_pack">Embalagem por unidade (R$)</label><input id="p_pack" value="0" type="text" inputmode="decimal"></div>
-          <div class="pricing-field"><label for="p_other">Outros custos por unidade (R$)</label><input id="p_other" value="0" type="text" inputmode="decimal"></div>
-          <div class="pricing-field"><label for="p_fee">Taxa sobre a venda (%)</label><input id="p_fee" value="0" type="text" inputmode="decimal"></div>
-        </div>
-        <p class="pricing-help">Em outros custos, inclua mão de obra, energia, corantes, frete ou uma reserva para perdas, sem repetir despesas.</p>
-      </details>
+      <p class="pricing-help" id="yield-note">Exemplo: se a receita de 260 g render 20 sabonetes, cada um terá peso teórico de 13 g.</p>
+      <p class="pricing-help" id="markup-note">150% de <strong>acréscimo sobre o custo</strong> significa preço de venda = custo × 2,5. Não é margem de 150% sobre o valor vendido.</p>
+      <p class="pricing-help" id="p_recipe_batch">Preços calculados usando a receita atual acima.</p>
+
       <div class="pricing-overview" aria-live="polite">
-        <div class="pricing-metric"><span>Ingredientes do lote</span><strong id="p_batch_total">—</strong></div>
-        <div class="pricing-metric"><span>Rendimento estimado do lote</span><strong id="p_yield">—</strong><span class="metric-small" id="p_leftover"></span></div>
+        <div class="pricing-metric"><span>Ingredientes do lote inteiro</span><strong id="p_batch_total">—</strong><span class="metric-small" id="p_partial_total"></span></div>
+        <div class="pricing-metric"><span>Peso estimado por sabonete</span><strong id="p_unit_weight">—</strong></div>
         <div class="pricing-metric"><span>Ingredientes por sabonete</span><strong id="p_unit_raw">—</strong></div>
-        <div class="pricing-metric"><span>Custo por unidade (+ taxas, quando informadas)</span><strong id="p_unit_cost">—</strong></div>
-        <div class="pricing-metric profit-metric"><span>Lucro estimado por unidade</span><strong id="p_profit">—</strong></div>
-        <div class="pricing-metric profit-metric"><span>Margem sobre a venda</span><strong id="p_margin">—</strong><span class="metric-small">Retorno sobre custo: <span id="p_markup">—</span></span></div>
+        <div class="pricing-metric"><span>Custo completo por sabonete (antes da taxa)</span><strong id="p_unit_cost">—</strong></div>
+        <div class="pricing-metric featured"><span>Preço de venda sugerido</span><strong id="p_suggested">—</strong></div>
+        <div class="pricing-metric featured"><span>Lucro estimado por sabonete</span><strong id="p_profit">—</strong></div>
+        <div class="pricing-metric"><span>Preço utilizado no cálculo</span><strong id="p_sale_used">—</strong></div>
+        <div class="pricing-metric"><span>Margem efetiva sobre venda</span><strong id="p_margin">—</strong></div>
       </div>
-      <p id="p_status" class="pricing-status" role="status">Informe o volume da embalagem do extrato de Hamamélis e o preço de venda para completar o cálculo.</p>
-      <p id="p_assumptions" class="pricing-assumptions">Resultados estimados. A quantidade de sabonetes depende do peso real e das perdas na produção.</p>
-      <p class="pricing-assumptions">Os preços são os valores iniciais que você informou e podem ser alterados. Alterações ficam salvas somente neste navegador. Os valores não incluem custo de investimento inicial ou tributos não informados. Este cálculo não valida a segurança ou a adequação da fórmula para venda.</p>
+      <p class="p-summary">Lucro estimado do lote inteiro: <strong id="p_lot_profit">—</strong></p>
+
+      <hr class="pricing-hr">
+      <h3>Matérias-primas</h3>
+      <p class="pricing-help">Altere o nome, a quantidade da embalagem e quanto pagou por cada produto. As quantidades utilizadas na <strong>receita original</strong> são calculadas automaticamente. Para incluir uma segunda essência, corante ou outro insumo, adicione um item e informe seu consumo no lote.</p>
+      <div id="p_products" class="p-products" aria-label="Produtos e custos por embalagem"></div>
+      <button id="p_add" class="p-add" type="button">+ Adicionar matéria-prima</button>
+      <p class="pricing-help">O extrato Hamamélis está com embalagem sem volume porque essa informação ainda não foi fornecida. Preencha para obter o custo e o preço de venda completos.</p>
+
+      <details class="pricing-details">
+        <summary>Embalagem, outros custos e taxas (opcional)</summary>
+        <div class="pricing-fields">
+          <div class="pricing-field">
+            <label for="p_pack_extra">Embalagem por sabonete (R$)</label>
+            <input id="p_pack_extra" type="text" value="0" inputmode="decimal">
+          </div>
+          <div class="pricing-field">
+            <label for="p_other_extra">Mão de obra, energia e outros por sabonete (R$)</label>
+            <input id="p_other_extra" type="text" value="0" inputmode="decimal">
+          </div>
+          <div class="pricing-field">
+            <label for="p_fee_input">Taxa sobre a venda (%)</label>
+            <input id="p_fee_input" type="text" value="0" inputmode="decimal">
+          </div>
+          <div class="pricing-field">
+            <label for="p_manual_sale">Preço praticado (R$) — opcional</label>
+            <input id="p_manual_sale" type="text" inputmode="decimal" placeholder="Usar preço sugerido">
+          </div>
+        </div>
+        <p class="pricing-help">Se preencher um preço praticado, o lucro considerará esse preço em vez da sugestão. Taxas são descontadas do preço de venda na apuração do lucro.</p>
+      </details>
+
+      <p id="p_status" class="pricing-status" role="status">Preencha os dados das embalagens para concluir a conta.</p>
+      <p class="pricing-assumptions" id="p_sale_note">O preço e o lucro são atualizados conforme o percentual escolhido.</p>
+      <p class="pricing-assumptions">A contagem de unidades é informada por você e substitui a estimativa por peso-padrão. O peso por peça continua estimado enquanto faltarem as densidades dos líquidos (hipótese de 1 g/mL). Insumos adicionais entram no <strong>custo</strong>, mas não alteram automaticamente o peso da receita original.</p>
+      <p class="p-notice">A fórmula 8/7/10 é um registro das quantidades informadas, não uma recomendação de segurança para fabricação e venda. Confira capacidade de aditivos da base, IFRA categoria 9 da essência e compatibilidade do lauril.</p>
+      <p class="pricing-assumptions">Preços e produtos editados ficam salvos apenas neste navegador. A calculadora não sincroniza valores entre dispositivos.</p>
     </section>
 
     <section class="card color-card" id="cores" aria-labelledby="colorTitle">
