@@ -16,7 +16,7 @@
     {id:'lau',type:'lau', name:'Lauril Éter Sulfato de Sódio 27%',unit:'mL',pack:'1000',price:'26,00',used:''}
   ];
   const clone = value => JSON.parse(JSON.stringify(value));
-  const baseDefaults={units:'20',markup:'150',pack:'0',other:'0',fee:'0',manualSale:''};
+  const baseDefaults={units:'20',markup:'150'};
   let state={products:clone(DEFAULT_PRODUCTS),...baseDefaults,next:1};
   const numeric = raw => {
     const t=String(raw??'').trim().replace(/\s+/g,'');
@@ -30,8 +30,7 @@
   const money = value => Number.isFinite(value)?BRL.format(value):'—';
   const measure = (value,unit) => Number.isFinite(value)?NUM.format(value)+' '+unit:'—';
   const output = (id,value) => {const e=byId(id); if(e)e.textContent=value;};
-  const formFields = {p_units:'units',p_markup_input:'markup',p_pack_extra:'pack',
-                      p_other_extra:'other',p_fee_input:'fee',p_manual_sale:'manualSale'};
+  const formFields = {p_units:'units',p_markup_input:'markup'};
   function store(){
     try {localStorage.setItem(KEY,JSON.stringify(state));}catch(_) {}
   }
@@ -69,10 +68,6 @@
               if(typeof legacy[fields[1]]==='string')p.price=legacy[fields[1]];
             }
           });
-          if(typeof legacy.p_pack==='string')state.pack=legacy.p_pack;
-          if(typeof legacy.p_other==='string')state.other=legacy.p_other;
-          if(typeof legacy.p_fee==='string')state.fee=legacy.p_fee;
-          // Nao migrar preco praticado antigo: nova versao parte do lucro automatico de 150%.
         }
       }
     } catch(_) {}
@@ -160,18 +155,13 @@
   }
   function calculate(){
     const {base,estimatedFinal}=formula();
-    const n=numeric(state.units),markup=numeric(state.markup),
-          packExtra=numeric(state.pack),other=numeric(state.other),
-          fee=numeric(state.fee),manualSale=numeric(state.manualSale);
+    const n=numeric(state.units), markup=numeric(state.markup);
     const validUnits=Number.isInteger(n)&&n>0&&n<=10000000;
     let sum=0, partial=0, complete=true;
     const problems=[];
     if(!positive(base))problems.push('Informe o peso da receita na calculadora acima.');
     if(!validUnits)problems.push('Informe a quantidade produzida em unidades inteiras maiores que zero.');
     if(!nonNegative(markup)||markup>100000)problems.push('Informe um percentual de lucro válido.');
-    if(!nonNegative(packExtra)||!nonNegative(other))problems.push('Confira os custos de embalagem e outros custos por unidade.');
-    if(!nonNegative(fee)||fee>=100)problems.push('A taxa sobre venda deve ficar entre 0% e menos de 100%.');
-    if(state.manualSale.trim() && !positive(manualSale))problems.push('Preço de venda manual deve ser maior que zero.');
     state.products.forEach(p=>{
       const used=usedAmount(p,base);
       const qty=numeric(p.pack),price=numeric(p.price);
@@ -195,15 +185,13 @@
     if(!positive(base))complete=false;
     sum=complete?partial:NaN;
     const rawUnit=complete&&validUnits?sum/n:NaN;
-    const extrasOK=nonNegative(packExtra)&&nonNegative(other)&&nonNegative(fee)&&fee<100;
-    const unitCost=extrasOK&&Number.isFinite(rawUnit)?rawUnit+packExtra+other:NaN;
-    // Markup is added on unit production cost. Card fee discounts profit after sale.
+    // O acréscimo comercial é calculado somente sobre matérias-primas.
+    // Não declarar lucro líquido: despesas indiretas não são contabilizadas nesta versão.
+    const unitCost=rawUnit;
     const suggestion=Number.isFinite(unitCost)&&nonNegative(markup)&&markup<=100000?
       unitCost*(1+markup/100):NaN;
-    const selling=state.manualSale.trim()?manualSale:suggestion;
-    const saleReady=positive(selling)&&extrasOK;
-    const netProfit=saleReady&&Number.isFinite(unitCost)?selling*(1-fee/100)-unitCost:NaN;
-    const margin=saleReady&&Number.isFinite(netProfit)?netProfit/selling*100:NaN;
+    const grossDifference=Number.isFinite(suggestion)&&Number.isFinite(unitCost)?suggestion-unitCost:NaN;
+    const margin=positive(suggestion)&&Number.isFinite(grossDifference)?grossDifference/suggestion*100:NaN;
     const estimateWeight=Number.isFinite(estimatedFinal)&&validUnits?estimatedFinal/n:NaN;
     output('p_batch_total',money(sum));
     output('p_partial_total',complete?'':'Parcial conhecido: '+money(partial)+' (custo incompleto)');
@@ -211,10 +199,9 @@
     output('p_unit_raw',money(rawUnit));
     output('p_unit_cost',money(unitCost));
     output('p_suggested',money(suggestion));
-    output('p_sale_used',money(saleReady?selling:NaN));
-    output('p_profit',money(netProfit));
+    output('p_profit',money(grossDifference));
     output('p_margin',Number.isFinite(margin)?NUM.format(margin)+'%':'—');
-    output('p_lot_profit',money(Number.isFinite(netProfit)&&validUnits?netProfit*n:NaN));
+    output('p_lot_profit',money(Number.isFinite(grossDifference)&&validUnits?grossDifference*n:NaN));
     output('p_recipe_batch',Number.isFinite(base)?
       'Receita atual: '+measure(base,'g')+' de base; peso final estimado de '+measure(estimatedFinal,'g')+'.':
       'Informe o peso da receita na calculadora acima.');
@@ -222,9 +209,7 @@
     const warning=byId('p_status');
     warning.textContent=problems.join(' ');
     warning.hidden=problems.length===0;
-    output('p_sale_note',state.manualSale.trim()?
-      'O lucro considera o preço de venda informado manualmente; o preço sugerido continua vinculado ao percentual de lucro.':
-      'O lucro considera o preço sugerido. Taxas de venda reduzem o lucro líquido.');
+    output('p_sale_note','O acréscimo sobre os ingredientes serve como reserva para outras despesas e lucro. Não representa lucro líquido, pois custos indiretos ainda não são informados.');
   }
   load();
   Object.keys(formFields).forEach(id=>{
