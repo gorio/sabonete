@@ -124,6 +124,7 @@
       unitWrap.append(select);fields.append(unitWrap);
     }
     fields.append(makeInput('Embalagem ('+p.unit+')',p.pack,value=>{p.pack=value;store();calculate();},'Ex.: 100'));
+    if (p.id==='ext') { const packageInput=fields.querySelector('input'); if(packageInput) packageInput.id='p_ext_pack_input'; }
     fields.append(makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00'));
     if(p.type==='custom')fields.append(makeInput('Uso neste lote ('+p.unit+')',p.used,value=>{p.used=value;store();calculate();},'Ex.: 2'));
     row.append(fields);
@@ -157,59 +158,87 @@
     const {base,estimatedFinal}=formula();
     const n=numeric(state.units), markup=numeric(state.markup);
     const validUnits=Number.isInteger(n)&&n>0&&n<=10000000;
-    let sum=0, partial=0, complete=true;
+    const validMarkup=nonNegative(markup)&&markup<=100000;
+    let partial=0, known=0;
+    const missing=[];
     const problems=[];
-    if(!positive(base))problems.push('Informe o peso da receita na calculadora acima.');
-    if(!validUnits)problems.push('Informe a quantidade produzida em unidades inteiras maiores que zero.');
-    if(!nonNegative(markup)||markup>100000)problems.push('Informe um percentual de lucro válido.');
+    if(!positive(base))problems.push('Informe um peso valido na calculadora principal.');
+    if(!validUnits)problems.push('Informe quantas unidades foram produzidas (numero inteiro maior que zero).');
+    if(!validMarkup)problems.push('Informe um percentual de acrescimo sobre o custo valido.');
+
+    const rows=new Map(Array.from(byId('p_products').children).map(row=>[row.dataset.id,row]));
     state.products.forEach(p=>{
       const used=usedAmount(p,base);
-      const qty=numeric(p.pack),price=numeric(p.price);
-      const entry=Array.from(byId('p_products').children).find(e=>e.dataset.id===p.id);
-      if(entry){
-        const label=entry.querySelector('[data-role="usage"]');
-        if(label)label.textContent='Uso no lote: '+measure(used,p.unit);
+      const qty=numeric(p.pack), price=numeric(p.price);
+      const row=rows.get(p.id);
+      if(row) {
+        const usedLabel=row.querySelector('[data-role="usage"]');
+        if(usedLabel) usedLabel.textContent='Uso no lote: '+measure(used,p.unit);
       }
       const ready=positive(qty)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0;
       const cost=ready?used*price/qty:NaN;
-      if(entry){
-        const dest=entry.querySelector('[data-role="cost"]');
-        if(dest)dest.textContent='Custo: '+money(cost);
+      if(row){
+        const costLabel=row.querySelector('[data-role="cost"]');
+        if(costLabel)costLabel.textContent='Custo: '+money(cost);
       }
-      if(ready)partial+=cost;
-      else {
-        complete=false;
-        problems.push('Complete embalagem, preço e uso de '+(p.name.trim()||'um novo ingrediente')+'.');
+      if(ready){
+        partial+=cost;
+        known++;
+      } else {
+        missing.push(p.name.trim()||'matéria-prima sem nome');
+        problems.push('Complete embalagem, preco e consumo de '+(p.name.trim()||'uma materia-prima')+'.');
       }
     });
-    if(!positive(base))complete=false;
-    sum=complete?partial:NaN;
-    const rawUnit=complete&&validUnits?sum/n:NaN;
-    // O acréscimo comercial é calculado somente sobre matérias-primas.
-    // Não declarar lucro líquido: despesas indiretas não são contabilizadas nesta versão.
-    const unitCost=rawUnit;
-    const suggestion=Number.isFinite(unitCost)&&nonNegative(markup)&&markup<=100000?
-      unitCost*(1+markup/100):NaN;
-    const grossDifference=Number.isFinite(suggestion)&&Number.isFinite(unitCost)?suggestion-unitCost:NaN;
-    const margin=positive(suggestion)&&Number.isFinite(grossDifference)?grossDifference/suggestion*100:NaN;
+
+    const complete=positive(base)&&missing.length===0;
+    const usable=positive(base)&&validUnits&&known>0;
+    const unitKnown=usable?partial/n:NaN;
+    const baseForPrice=usable&&validMarkup?unitKnown:NaN;
+    const priceKnown=Number.isFinite(baseForPrice)?baseForPrice*(1+markup/100):NaN;
+    const grossDifference=complete&&Number.isFinite(priceKnown)?priceKnown-unitKnown:NaN;
+    const margin=complete&&positive(priceKnown)?grossDifference/priceKnown*100:NaN;
     const estimateWeight=Number.isFinite(estimatedFinal)&&validUnits?estimatedFinal/n:NaN;
-    output('p_batch_total',money(sum));
-    output('p_partial_total',complete?'':'Parcial conhecido: '+money(partial)+' (custo incompleto)');
+
+    // Mesmo quando uma embalagem estiver sem volume, exibir os custos conhecidos.
+    // O preco parcial NAO e uma recomendacao de preco final para venda.
+    output('p_batch_total',usable?money(partial):'—');
+    output('p_partial_total',!complete&&usable?
+      'Parcial: '+known+' produto(s) conhecido(s); faltam '+missing.length+' custo(s).':'');
     output('p_unit_weight',measure(estimateWeight,'g/un'));
-    output('p_unit_raw',money(rawUnit));
-    output('p_unit_cost',money(unitCost));
-    output('p_suggested',money(suggestion));
+    output('p_unit_raw',money(unitKnown));
+    output('p_unit_cost',money(unitKnown));
+    output('p_suggested',money(priceKnown));
     output('p_profit',money(grossDifference));
     output('p_margin',Number.isFinite(margin)?NUM.format(margin)+'%':'—');
     output('p_lot_profit',money(Number.isFinite(grossDifference)&&validUnits?grossDifference*n:NaN));
     output('p_recipe_batch',Number.isFinite(base)?
       'Receita atual: '+measure(base,'g')+' de base; peso final estimado de '+measure(estimatedFinal,'g')+'.':
       'Informe o peso da receita na calculadora acima.');
-    output('markup-note',nonNegative(markup)? NUM.format(markup)+'% de acréscimo sobre o custo significa multiplicar o custo por '+NUM.format(1+markup/100)+'. Não confunda esse acréscimo com margem sobre a venda.' : 'Informe um percentual de lucro válido.');
-    const warning=byId('p_status');
-    warning.textContent=problems.join(' ');
-    warning.hidden=problems.length===0;
-    output('p_sale_note','O acréscimo sobre os ingredientes serve como reserva para outras despesas e lucro. Não representa lucro líquido, pois custos indiretos ainda não são informados.');
+    output('markup-note',validMarkup?
+      NUM.format(markup)+'% de acréscimo sobre o custo = custo x '+NUM.format(1+markup/100)+
+      '. Isso nao e margem de lucro sobre as vendas.':'Informe um percentual valido.');
+
+    output('p_batch_label',complete?'Ingredientes do lote inteiro':'Ingredientes com custo conhecido (parcial)');
+    output('p_unit_raw_label',complete?'Ingredientes por sabonete':'Custo parcial por sabonete');
+    output('p_unit_cost_label',complete?'Custo dos ingredientes por sabonete':'Custo minimo conhecido por sabonete');
+    output('p_suggested_label',complete?'Preco de venda sugerido':'Preco calculado com custos conhecidos (nao final)');
+    output('p_profit_label','Acréscimo bruto por sabonete');
+    output('p_margin_label','Margem bruta teórica sobre venda');
+
+    const status=byId('p_status');
+    if(missing.length>0 && positive(base)){
+      status.textContent='Custo ainda incompleto: '+missing.join(', ')+
+        '. Os valores exibidos sao PARCIAIS. Informe os dados faltantes para obter o preco sugerido definitivo.';
+    } else {
+      status.textContent=problems.join(' ');
+    }
+    status.hidden=complete&&validUnits&&validMarkup;
+    const ext=state.products.find(p=>p.id==='ext');
+    const needExt=!!ext && !positive(numeric(ext.pack));
+    byId('p_action').hidden=!needExt;
+    output('p_sale_note',complete?
+      'Preco sugerido pelo custo dos ingredientes e pelo percentual de acrescimo escolhido. Despesas indiretas nao estao contabilizadas.':
+      'Ainda NAO e um preco final: o custo de ingredientes em aberto sera somado quando voce preencher as embalagens. O valor apresentado serve somente como referencia parcial.');
   }
   load();
   Object.keys(formFields).forEach(id=>{
