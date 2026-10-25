@@ -21,13 +21,17 @@
     temperaturas:{
       title:'Guia de temperaturas',
       description:'Consulte etapas de aquecimento, adição de ingredientes e moldagem, com referências específicas dos fabricantes.'
+    },
+    treinamento:{
+      title:'Treinamento online',
+      description:'Aprenda em módulos, acompanhe o plano das vídeo-aulas e pratique utilizando as ferramentas da calculadora.'
     }
   };
   const pages=Array.from(document.querySelectorAll('[data-screen]'));
   const links=Array.from(document.querySelectorAll('[data-screen-link]'));
   const title=document.getElementById('screenHeading');
   const subtitle=document.getElementById('screenDescription');
-  if(!title || !subtitle || pages.length!==5 || links.length!==5)return;
+  if(!title || !subtitle || pages.length!==6 || links.length!==6)return;
 
   const selectedHash=()=>{
     let hash='';
