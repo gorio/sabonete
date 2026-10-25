@@ -78,6 +78,7 @@
   <link rel="stylesheet" href="app.css?v=20261025-menus1">
   <link rel="stylesheet" href="training.css?v=20261025-niveis2">
   <link rel="stylesheet" href="atelier.css?v=b7fbc42a252ce33f848840f5ef659d8a82db4e1f">
+  <link rel="stylesheet" href="molds.css?v=20261025-moldes1">
 </head>
 <body>
   <div class="app-shell">
@@ -90,6 +91,7 @@
       <nav class="module-nav" aria-label="Navegação entre ferramentas">
         <a class="module-link" data-screen-link="receita" href="#receita" aria-current="page"><span class="module-icon" aria-hidden="true">⚖️</span> Receita</a>
         <a class="module-link" data-screen-link="atelie" href="#atelie"><span class="module-icon" aria-hidden="true">📒</span> Meu Ateliê</a>
+        <a class="module-link" data-screen-link="moldes" href="#moldes"><span class="module-icon" aria-hidden="true">🧼</span> Formas e Moldes</a>
         <a class="module-link" data-screen-link="ingredientes" href="#ingredientes"><span class="module-icon" aria-hidden="true">📦</span> Matérias-primas</a>
         <a class="module-link" data-screen-link="venda" href="#venda"><span class="module-icon" aria-hidden="true">💰</span> Preço de venda</a>
         <a class="module-link" data-screen-link="treinamento" href="#treinamento"><span class="module-icon" aria-hidden="true">🎓</span> Treinamento</a>
@@ -188,6 +190,61 @@
       </section>
       <p id="atelierNotice" class="atelier-notice" role="status" aria-live="polite" hidden></p>
       <p class="atelier-disclaimer">Dados locais podem ser perdidos se o armazenamento do navegador for limpo. Os lotes são declarados pelo usuário; não há baixa automática em estoque. As estimativas de peso não representam validação técnica, e preços históricos precisam ser conferidos antes de produzir ou vender.</p>
+    </section>
+
+    <section class="card module-screen" id="moldes" data-screen="moldes" aria-labelledby="moldes-title">
+      <div class="mold-hero">
+        <span class="mold-eyebrow">Planejamento de produção</span>
+        <h2 id="moldes-title">Formas e Moldes</h2>
+        <p>Calcule os ingredientes a partir do número de cavidades, da massa final desejada por sabonete e de quantas vezes a forma será preenchida.</p>
+      </div>
+      <div class="mold-grid">
+        <section class="mold-panel" aria-labelledby="moldInputTitle">
+          <h3 id="moldInputTitle">Configure a produção</h3>
+          <p>Use o peso final em gramas por cavidade. Quando possível, estime essa capacidade com uma peça já produzida: o volume geométrico do molde não é automaticamente igual ao peso final.</p>
+          <div class="mold-fields">
+            <label for="moldCavities">Cavidades por forma
+              <input id="moldCavities" type="text" inputmode="numeric" value="10" autocomplete="off" placeholder="Ex.: 10">
+            </label>
+            <label for="moldGrams">Peso final por cavidade (g)
+              <input id="moldGrams" type="text" inputmode="decimal" value="100" autocomplete="off" placeholder="Ex.: 100">
+            </label>
+            <label for="moldCycles">Quantas vezes preencher
+              <input id="moldCycles" type="text" inputmode="numeric" value="1" autocomplete="off" placeholder="Ex.: 2">
+            </label>
+            <label for="moldReserve">Reserva para perdas (%)
+              <input id="moldReserve" type="text" inputmode="decimal" value="5" autocomplete="off" placeholder="Ex.: 5">
+            </label>
+          </div>
+          <p class="mold-field-note">A reserva aumenta o volume de ingredientes planejado, mas não a quantidade de sabonetes prevista. Você pode ajustar essa reserva conforme suas perdas reais.</p>
+          <p id="moldValidation" class="mold-field-note" role="status"></p>
+          <button id="moldApply" class="mold-cta" type="button">Aplicar à receita e à venda</button>
+          <div class="mold-save-box">
+            <h3>Salvar esta forma</h3>
+            <label for="moldName">Nome ou identificação
+              <input id="moldName" type="text" maxlength="90" autocomplete="off" placeholder="Ex.: Forma floral 10 × 100 g">
+            </label>
+            <button class="mold-cta mold-save-action" id="moldSave" type="button">Salvar molde no meu catálogo</button>
+          </div>
+        </section>
+        <section class="mold-panel" aria-labelledby="moldOutputTitle">
+          <h3 id="moldOutputTitle">Materiais estimados para o lote</h3>
+          <p>Prévia matemática com a proporção atual da calculadora: por 100 g de base, 8 mL de essência, 7 mL de extrato e 10 mL de lauril.</p>
+          <div class="mold-results">
+            <div class="mold-stat"><small>Sabonetes previstos</small><strong id="moldTotalUnits">—</strong></div>
+            <div class="mold-stat"><small>Peso final total, com reserva</small><strong id="moldFinishedMass">—</strong></div>
+            <div class="mold-stat large"><small>Base vegetal necessária</small><strong id="moldBaseMass">—</strong></div>
+            <div class="mold-stat"><small>Essência</small><strong id="moldEssence">—</strong></div>
+            <div class="mold-stat"><small>Extrato glicólico</small><strong id="moldExtract">—</strong></div>
+            <div class="mold-stat"><small>Lauril</small><strong id="moldLauril">—</strong></div>
+          </div>
+          <p id="moldSummary" class="mold-summary" aria-live="polite"></p>
+          <div class="mold-saved-header"><h3>Meus moldes</h3><small id="moldLibraryCount">0 de 25 moldes</small></div>
+          <div id="moldLibrary" class="mold-library" aria-live="polite"></div>
+        </section>
+      </div>
+      <p id="moldNotice" class="mold-notice" role="status" aria-live="polite" hidden></p>
+      <p class="mold-warning"><strong>Sobre esta estimativa:</strong> o peso final é aproximado, pois depende das densidades reais dos aditivos. Quantidades de ingredientes personalizadas não são redimensionadas automaticamente quando você muda o peso; confira-as na aba Matérias-primas. A fórmula 8/7/10 é um parâmetro informado e não uma receita tecnicamente validada para fabricação ou venda.</p>
     </section>
 
     <section class="card pricing-card module-screen" id="ingredientes" data-screen="ingredientes" aria-labelledby="ingredients-title">
@@ -505,7 +562,8 @@
   <script src="palette.js" defer></script>
   <script src="pricing.js?v=1eb7118b96ee4bc6e84e57335af584203e2b00d9" defer></script>
   <script src="training.js?v=20261025-niveis2" defer></script>
-  <script src="atelier.js?v=cdb900a92e8f79d655512433a72b35909b71136d" defer></script>
+  <script src="molds.js?v=20261025-moldes1" defer></script>
+  <script src="atelier.js?v=20261025-moldes1" defer></script>
   <script src="app.js?v=f324a3f9ed8268a7ff3eb7fd97342d1c41de3b2e" defer></script>
 </body>
 </html>
