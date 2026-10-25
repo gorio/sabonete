@@ -47,3 +47,28 @@
  .pricing-metric strong{font-size:17px}
  .p-name{font-size:12px}
 }
+
+/* Interface enxuta: um preco por unidade em destaque */
+.p-sale-hero{margin:14px 0 10px;padding:22px 19px;background:#e5f3e9;border:1px solid #c9e3d2;border-radius:16px;text-align:center}
+.p-sale-title{display:block;color:#2e6446;font-size:13px;font-weight:760;letter-spacing:.01em}
+.p-sale-price{display:block;color:#1a633d;font-size:clamp(38px,9vw,54px);line-height:1.15;font-weight:850;letter-spacing:-.035em;margin:8px 0;font-variant-numeric:tabular-nums}
+.p-sale-note{font-size:12px;color:#466554;line-height:1.55;max-width:390px;margin:0 auto}
+.p-sale-hero.incomplete{background:#fdf8ee;border-color:#efd6a9}
+.p-sale-hero.incomplete .p-sale-title,.p-sale-hero.incomplete .p-sale-price{color:#8b602b}
+.p-sale-hero.incomplete .p-sale-note{color:#755a38}
+.p-quick-missing{margin-top:16px;text-align:left;background:#fff;border:1px solid #ebd9bd;border-radius:12px;padding:12px}
+.p-quick-missing label{font-size:13px;font-weight:750;line-height:1.4;margin:0 0 9px;display:block}
+.p-quick-missing .p-quick-help{font-size:11px;margin-top:8px;color:#6b6959;line-height:1.5}
+.p-quick-input{display:flex;align-items:center;gap:10px}
+.p-quick-input input{padding:11px 12px;border:1px solid #d2dcd4;border-radius:10px;min-width:0;width:100%;font:750 18px system-ui,sans-serif;color:var(--ink);background:white}
+.p-quick-input .unit{font-size:14px}
+.p-simple-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}
+.p-simple-item{background:#f0f5f0;border-radius:11px;padding:13px}
+.p-simple-item span{display:block;font-size:11px;color:var(--muted);font-weight:700;line-height:1.4}
+.p-simple-item strong{display:block;font-size:18px;color:var(--ink);margin-top:5px;font-variant-numeric:tabular-nums}
+.p-prices-panel{border-top:1px solid var(--stroke);padding-top:14px;margin-top:17px}
+.p-prices-panel summary{font-weight:760;color:var(--accent);cursor:pointer;padding:7px 0;font-size:15px}
+.p-prices-panel[open] summary{margin-bottom:12px}
+.p-sale-hero .pricing-status{font-size:12px;text-align:left;margin:12px 0 0;background:#fff7e9}
+.p-sale-hero .pricing-status[hidden],.p-quick-missing[hidden]{display:none}
+@media(max-width:380px){.p-sale-hero{padding:18px 12px}.p-simple-item{padding:10px}.p-simple-item strong{font-size:16px}}
