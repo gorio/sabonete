@@ -1,0 +1,49 @@
+/* Calculadora de formas e moldes – planejamento sem controle de estoque */
+.mold-hero{border-radius:16px;padding:22px 24px;margin-bottom:20px;background:linear-gradient(120deg,#173f2e,#2d7350);color:#fff}
+.mold-hero .mold-eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:850;color:#cce8d6}
+.mold-hero h2{font-size:26px!important;margin:8px 0 7px!important;line-height:1.14;color:#fff}
+.mold-hero p{font-size:13px;line-height:1.6;color:#e1efe5;margin:0;max-width:670px}
+.mold-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:17px}
+.mold-panel{border:1px solid var(--stroke);border-radius:15px;background:#fbfdfb;padding:19px;min-width:0}
+.mold-panel h3{margin:0 0 10px;font-size:18px}
+.mold-panel>p{margin:0 0 16px;font-size:12px;line-height:1.6;color:var(--muted)}
+.mold-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mold-fields label,.mold-save-box label{font-size:12px;display:block;color:#365540;font-weight:760;line-height:1.3;margin:0}
+.mold-fields input,.mold-save-box input{
+  display:block;width:100%;margin-top:7px;padding:11px 12px;min-height:43px;background:white;
+  border:1px solid #c6dac9;border-radius:10px;color:var(--ink);font:600 15px system-ui,sans-serif;
+}
+.mold-fields input:focus-visible,.mold-save-box input:focus-visible{outline:3px solid #95caaa;outline-offset:2px}
+.mold-field-note{font-size:11px;line-height:1.6;color:#68806f;margin-top:14px}
+.mold-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:15px}
+.mold-stat{padding:12px;border:1px solid #d8e9da;border-radius:11px;background:white}
+.mold-stat small{display:block;color:#718074;font-size:11px;line-height:1.35}
+.mold-stat strong{display:block;margin-top:6px;font-size:20px;color:var(--accent);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mold-stat.large{background:#ebf5ed;border-color:#cce4d2;grid-column:1/-1}
+.mold-stat.large strong{font-size:25px}
+.mold-summary{font-size:11px;line-height:1.5;color:#53715b;margin-top:13px}
+.mold-cta{margin-top:15px;min-height:45px;width:100%;border:0;border-radius:10px;background:var(--accent);color:white;font-size:13px;font-weight:850;cursor:pointer;padding:12px 15px}
+.mold-cta:disabled{opacity:.5;cursor:not-allowed}
+.mold-cta:not(:disabled):hover{filter:brightness(.92)}
+.mold-save-box{border-top:1px solid var(--stroke);margin-top:19px;padding-top:18px}
+.mold-save-box h3{font-size:16px}
+.mold-save-action{background:white;color:var(--accent);border:1px solid #a2cdb0}
+.mold-saved-header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:22px 0 10px}
+.mold-saved-header h3{margin:0;font-size:16px}
+.mold-saved-header small{color:var(--muted);font-size:11px}
+.mold-library{display:grid;gap:8px}
+.mold-item{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:11px;border-radius:11px;border:1px solid var(--stroke);background:#fff}
+.mold-item-desc{min-width:0;display:flex;flex-direction:column;gap:5px}
+.mold-item-desc strong{font-size:13px;overflow-wrap:anywhere}
+.mold-item-desc small{font-size:11px;color:var(--muted)}
+.mold-item-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mold-item-actions button{font-size:11px;border-radius:8px;padding:8px 9px;cursor:pointer;font-weight:750}
+.mold-load{background:#eaf5ed;border:1px solid #cce2d0;color:#235e3c}
+.mold-delete{background:#fff;border:1px solid var(--stroke);color:#68746c}
+.mold-empty{padding:14px;border:1px dashed #c5d8c7;border-radius:11px;color:#6a7d70;font-size:12px;line-height:1.6;margin:0}
+.mold-notice{font-size:12px;line-height:1.5;border-radius:10px;margin:15px 0 0;padding:11px 13px;color:#255c3b;background:#eef8f0;border:1px solid #cce5d3}
+.mold-notice.is-error{color:#824b2a;background:#fff7ef;border-color:#efd5b9}
+.mold-notice[hidden]{display:none}
+.mold-warning{background:#fffaf0;border:1px solid #eedcc4;color:#745a36;padding:13px;border-radius:11px;font-size:12px;line-height:1.6;margin:18px 0 0}
+@media(max-width:1150px){.mold-grid{grid-template-columns:1fr}}
+@media(max-width:490px){.mold-fields{grid-template-columns:1fr}.mold-item{align-items:flex-start;flex-direction:column}.mold-item-actions{width:100%}.mold-grid{gap:12px}.mold-hero{padding:20px}}
