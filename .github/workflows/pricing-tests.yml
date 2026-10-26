@@ -4,11 +4,17 @@ on:
     branches: [main]
     paths:
       - 'pricing.js'
+      - 'index.html'
+      - 'molds.js'
+      - 'atelier.js'
       - 'tests/**'
       - '.github/workflows/pricing-tests.yml'
   pull_request:
     paths:
       - 'pricing.js'
+      - 'index.html'
+      - 'molds.js'
+      - 'atelier.js'
       - 'tests/**'
       - '.github/workflows/pricing-tests.yml'
 permissions:
@@ -25,4 +31,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run pricing regression tests
-        run: node --test tests/pricing-regression.test.mjs
+        run: node --test tests/*.test.mjs
