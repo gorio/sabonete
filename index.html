@@ -34,6 +34,11 @@
     input:focus-visible { outline:none; }
     .unit { color:var(--muted); font-size:20px; font-weight:750; }
     .recipe { color:var(--muted); font-size:13px; line-height:1.5; margin:12px 0 0; }
+    .recipe-option { margin:17px 0 8px;padding:14px 16px;border:1px solid #cbe1d1;border-radius:12px;background:#f3f9f4; }
+    .recipe-option label {display:flex;align-items:flex-start;gap:11px;margin:0;cursor:pointer;font-size:14px;font-weight:750;line-height:1.5}
+    .recipe-option input {width:19px;height:19px;min-width:19px;accent-color:var(--accent);margin:1px 0 0;padding:0}
+    .recipe-option small {display:block;font-size:12px;color:var(--muted);line-height:1.5;margin:6px 0 0 30px}
+    .recipe-option:has(input:checked) {background:#e7f4e9;border-color:#9fccad}
     .err { color:#a13a32; font-size:13px; font-weight:650; margin:8px 0 0; }
     .divider { border:0; border-top:1px solid var(--stroke); margin:24px 0 17px; }
     h2 { font-size:18px; letter-spacing:-.02em; margin:0 0 10px; }
@@ -121,7 +126,11 @@
         <input id="weight" type="text" inputmode="decimal" value="150" autocomplete="off" aria-describedby="formula">
         <span class="unit">g</span>
       </div>
-      <p class="recipe" id="formula">Proporção: a cada 100 g de base, 8 mL de essência, 7 mL de extrato e 10 mL de lauril.</p>
+      <div class="recipe-option">
+        <label for="includeOil"><input id="includeOil" type="checkbox"> <span>Incluir óleo vegetal <strong>(opcional)</strong> · 2,5 mL por 100 g de base</span></label>
+        <small>Desativado por padrão. Ative apenas se utilizar óleo. Confira limites de aditivos e compatibilidade da base.</small>
+      </div>
+      <p class="recipe" id="formula">Proporção: a cada 100 g de base, 8 mL de essência, 7 mL de extrato e 10 mL de lauril. Óleo opcional: 2,5 mL.</p>
       <p class="err" id="error" role="alert"></p>
       <hr class="divider">
       <h2>Ingredientes</h2>
@@ -131,6 +140,7 @@
           <tr><td>Essência <small>(8 mL/100 g)</small></td><td id="essencia">12,00 mL</td></tr>
           <tr><td>Extrato glicólico <small>(7 mL/100 g)</small></td><td id="extrato">10,50 mL</td></tr>
           <tr><td>Lauril <small>(10 mL/100 g)</small></td><td id="lauril">15,00 mL</td></tr>
+          <tr><td>Óleo vegetal <small>(opcional · 2,5 mL/100 g)</small></td><td id="oleo">0,00 mL (não incluído)</td></tr>
         </tbody>
       </table>
       <div class="result" aria-live="polite">
@@ -529,8 +539,13 @@
     (() => {
       const $ = id => document.getElementById(id);
       const fmt = new Intl.NumberFormat('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
-      const rates = Object.freeze({essencia: .08, extrato: .07, lauril: .10});
-      const multiplier = 1 + rates.essencia + rates.extrato + rates.lauril;
+      const rates = Object.freeze({essencia: .08, extrato: .07, lauril: .10, oleo: .025});
+      const oilEnabled = () => $('includeOil').checked;
+      const multiplier = () => 1 + rates.essencia + rates.extrato + rates.lauril + (oilEnabled() ? rates.oleo : 0);
+      try {
+        const saved=JSON.parse(localStorage.getItem('sabonete-receita-v1')||'null');
+        $('includeOil').checked=!!(saved && saved.includeOil === true);
+      } catch (_) { $('includeOil').checked=false; }
       let mode = 'base';
       function parseBrazilNumber(raw) {
         const input = String(raw).trim().replace(/\s+/g, '');
@@ -542,12 +557,16 @@
         const amount = parseBrazilNumber($('weight').value);
         const ok = Number.isFinite(amount) && amount > 0 && amount <= 1e9;
         $('error').textContent = ok ? '' : 'Informe um peso maior que zero.';
-        const base = ok ? (mode === 'base' ? amount : amount / multiplier) : NaN;
+        const factor=multiplier();
+        const base = ok ? (mode === 'base' ? amount : amount / factor) : NaN;
         $('base').textContent = fmtMeasure(base, 'g');
         for (const [ingredient, rate] of Object.entries(rates)) {
-          $(ingredient).textContent = fmtMeasure(base * rate, 'mL');
+          $(ingredient).textContent = ingredient === 'oleo' && !oilEnabled()
+            ? '0,00 mL (não incluído)' : fmtMeasure(base * rate, 'mL');
         }
-        $('total').textContent = fmtMeasure(base * multiplier, 'g');
+        $('formula').textContent = 'Para cada 100 g de base: 8 mL de essência, 7 mL de extrato, 10 mL de lauril'
+          + (oilEnabled() ? ' e 2,5 mL de óleo vegetal.' : '. Óleo vegetal opcional: 2,5 mL.');
+        $('total').textContent = fmtMeasure(base * factor, 'g');
         $('finalLabel').textContent = mode === 'final' ? 'Peso final desejado (estimativa)' : 'Peso final estimado';
         $('estimate').textContent = mode === 'final'
           ? 'Para chegar a esse peso, usamos provisoriamente 1 g/mL. O peso final real depende da densidade dos líquidos.'
@@ -567,6 +586,10 @@
       $('tabBase').addEventListener('click', () => changeMode('base'));
       $('tabFinal').addEventListener('click', () => changeMode('final'));
       $('weight').addEventListener('input', update);
+      $('includeOil').addEventListener('change',()=>{
+        try {localStorage.setItem('sabonete-receita-v1',JSON.stringify({includeOil:oilEnabled()}));}catch(_){}
+        update();
+      });
       update();
     })();
   </script>
