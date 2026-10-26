@@ -13,7 +13,8 @@
     {id:'base',type:'base', name:'Base vegetal V&G / Quimiz',unit:'g', pack:'3000',packUnit:'g',price:'78,89', used:''},
     {id:'ess',type:'ess', name:'Essência Capim-Limão',unit:'mL',pack:'100',packUnit:'mL',price:'26,60',used:''},
     {id:'ext',type:'ext', name:'Extrato glicólico Hamamélis',unit:'mL',pack:'',packUnit:'mL',price:'12,00',used:''},
-    {id:'lau',type:'lau', name:'Lauril Éter Sulfato de Sódio 27%',unit:'mL',pack:'1000',packUnit:'mL',price:'26,00',used:''}
+    {id:'lau',type:'lau', name:'Lauril Éter Sulfato de Sódio 27%',unit:'mL',pack:'1000',packUnit:'mL',price:'26,00',used:''},
+    {id:'oil',type:'oil', name:'Óleo vegetal (opcional)',unit:'mL',pack:'',packUnit:'mL',price:'',used:''}
   ];
   const clone = value => JSON.parse(JSON.stringify(value));
   const unitChoices = (unit) => unit==='g'?['g','kg']:unit==='mL'?['mL','L']:['un'];
@@ -50,7 +51,7 @@
       const saved=JSON.parse(localStorage.getItem(KEY)||'null');
       if(saved && Array.isArray(saved.products) && saved.products.length<=MAX_ITEMS
          && typeof saved.next==='number' && saved.next>0 && saved.next<=1e8){
-        const types=['base','ess','ext','lau','custom'];
+        const types=['base','ess','ext','lau','oil','custom'];
         const restored=saved.products.filter(p=>p && typeof p.id==='string'
           && p.id.length<40 && types.includes(p.type)
           && typeof p.name==='string' && p.name.length<150
@@ -67,7 +68,7 @@
           packUnit:validPackUnit(p.unit,p.packUnit),
           usedUnit:validPackUnit(p.unit,p.usedUnit)
         }));
-        state={...state,products:[...original,...customs.slice(0,MAX_ITEMS-4)],next:saved.next};
+        state={...state,products:[...original,...customs.slice(0,MAX_ITEMS-5)],next:saved.next};
         Object.keys(baseDefaults).forEach(key=>{
           if(typeof saved[key]==='string' && saved[key].length<50)state[key]=saved[key];
         });
@@ -126,7 +127,8 @@
         row.remove();store();calculate();
       });
       heading.append(remove);
-    } else heading.append(make('span','p-auto','Uso sugerido pela receita'));
+    } else heading.append(make('span','p-auto',p.id==='oil'?
+      'Opcional · ative na Receita':'Uso sugerido pela receita'));
     row.append(heading);
     const fields=make('div','p-product-fields');
     if(p.type==='custom'){
@@ -247,11 +249,13 @@
     rows.replaceChildren(...state.products.map(addRow));
     byId('p_add').disabled=state.products.length>=MAX_ITEMS;
   }
+  const oilIncluded=()=>!!(byId('includeOil')&&byId('includeOil').checked);
   function formula() {
     const input=numeric(byId('weight').value);
     const final=byId('tabFinal').getAttribute('aria-pressed')==='true';
-    const base=positive(input)?(final?input/1.25:input):NaN;
-    return {base,estimatedFinal:base*1.25};
+    const factor=1.25+(oilIncluded()?0.025:0);
+    const base=positive(input)?(final?input/factor:input):NaN;
+    return {base,estimatedFinal:base*factor};
   }
   function recipeUsed(p,base) {
     if(!Number.isFinite(base))return NaN;
@@ -259,6 +263,7 @@
     if(p.type==='ess')return base*0.08;
     if(p.type==='ext')return base*0.07;
     if(p.type==='lau')return base*0.10;
+    if(p.type==='oil')return oilIncluded()?base*0.025:0;
     return NaN;
   }
   function autoUsedDisplay(p,base) {
@@ -280,10 +285,12 @@
   }
   // An untouched optional row should not block a finished recipe.
   // It remains saved so the artisan can continue filling it in later.
-  const emptyDraft=p=>p.type==='custom' &&
-    ['name','pack','price','used'].every(key=>!String(p[key]??'').trim());
+  const emptyDraft=p=>(p.id==='oil'&&!oilIncluded()) ||
+    (p.type==='custom'&&
+      ['name','pack','price','used'].every(key=>!String(p[key]??'').trim()));
   function itemCheck(p,base){
-    if(emptyDraft(p))return {ignored:true,valid:false,reason:'',field:null,
+    if(emptyDraft(p))return {ignored:true,valid:false,reason:p.id==='oil'?
+      'Óleo desativado na aba Receita: fora do custo.':'',field:null,
       used:NaN,qty:NaN,price:NaN,cost:NaN,purchaseUnit:NaN};
     const used=usedAmount(p,base),qty=packageAmount(p),price=numeric(p.price);
     const suspicious=positive(qty)&&qty<=1&&used>qty&&p.unit!=='un';
@@ -322,7 +329,8 @@
         if(issue){
           issue.hidden=check.valid;
           issue.textContent=check.ignored?
-            'Rascunho vazio: não entra no custo até você começar a preenchê-lo.':
+            (p.id==='oil'?'Óleo opcional desativado. Ative-o na Receita para incluir a quantidade e o custo.':
+            'Rascunho vazio: não entra no custo até você começar a preenchê-lo.') :
             check.reason;
         }
       }
@@ -466,6 +474,7 @@
   });
   ['weight','tabBase','tabFinal'].forEach(id=>
     byId(id).addEventListener(id==='weight'?'input':'click',calculate));
+  if(byId('includeOil'))byId('includeOil').addEventListener('change',calculate);
   // API publica para o Atelie: somente dados locais, sem autenticacao/remoto.
   // Os precos ficam vinculados a cada versao salva da receita.
   function pricingSummary(){
@@ -507,7 +516,7 @@
          !['pack','price','used'].every(k=>typeof p[k]==='string'&&p[k].length<49))
          return false;
       seen.add(p.id);
-      if(['base','ess','ext','lau'].includes(p.id)){
+      if(['base','ess','ext','lau','oil'].includes(p.id)){
         if(p.type!==p.id||p.unit!==(p.id==='base'?'g':'mL'))return false;
       } else if(p.type!=='custom'||!/^extra-\d+$/.test(p.id))return false;
     }
