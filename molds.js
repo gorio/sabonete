@@ -8,6 +8,7 @@
   if(!$('moldes'))return;
   const KEY='sabonete-moldes-v1',MAX=25;
   const fields=['moldCavities','moldGrams','moldCycles','moldReserve'];
+  const oilIncluded=()=>!!($('includeOil')&&$('includeOil').checked);
   const example={cavities:'10',grams:'100',cycles:'1',reserve:'5'};
   const fmt=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2,minimumFractionDigits:0});
   let store={molds:[]};
@@ -72,15 +73,16 @@
     if(!valid){
       preview=null;
       $('moldSummary').textContent='Aguardando informações válidas da forma.';
-      for(const id of ['moldTotalUnits','moldFinishedMass','moldBaseMass','moldEssence','moldExtract','moldLauril'])
+      for(const id of ['moldTotalUnits','moldFinishedMass','moldBaseMass','moldEssence','moldExtract','moldLauril','moldOil'])
         $(id).textContent='—';
       return;
     }
     const units=x.cavities*x.cycles;
     const production=units*x.grams;
     const total=production*(1+x.reserve/100);
-    const base=total/1.25;
-    preview={units,production,total,base,essence:base*.08,extract:base*.07,lauril:base*.10};
+    const base=total/(1.25+(oilIncluded()?0.025:0));
+    preview={units,production,total,base,essence:base*.08,extract:base*.07,lauril:base*.10,
+      oil:oilIncluded()?base*.025:0};
     const format=(n,unit)=>fmt.format(n)+' '+unit;
     $('moldTotalUnits').textContent=fmt.format(units);
     $('moldFinishedMass').textContent=format(total,'g estimados');
@@ -88,6 +90,8 @@
     $('moldEssence').textContent=format(preview.essence,'mL');
     $('moldExtract').textContent=format(preview.extract,'mL');
     $('moldLauril').textContent=format(preview.lauril,'mL');
+    $('moldOil').textContent=oilIncluded()?
+      format(preview.oil,'mL'):'0 mL (não incluído)';
     $('moldSummary').textContent='Peças: '+units+' · '+fmt.format(x.grams)+
       ' g finais estimados por peça · reserva de '+fmt.format(x.reserve)+'% incluída no total de materiais.';
   }
@@ -161,6 +165,7 @@
     window.location.hash='venda';
   });
   for(const id of fields)$(id).addEventListener('input',update);
+  if($('includeOil'))$('includeOil').addEventListener('change',update);
   $('moldName').addEventListener('input',()=>notice(''));
   window.SaboneteMolds=Object.freeze({
     capture:()=>clone(store),
