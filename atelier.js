@@ -51,7 +51,8 @@
   const newId=()=>String(Date.now())+'-'+Math.floor(Math.random()*1e7);
   const getForm=()=>({
     mode:$('tabFinal').getAttribute('aria-pressed')==='true'?'final':'base',
-    weight:$('weight').value
+    weight:$('weight').value,
+    includeOil:!!($('includeOil')&&$('includeOil').checked)
   });
   const getValue=x=>{
     const t=String(x??'').trim().replace(/\s/g,'');
@@ -61,6 +62,7 @@
   };
   const validForm=f=>f&&['base','final'].includes(f.mode)&&
     typeof f.weight==='string'&&f.weight.length<35&&
+    (f.includeOil===undefined||typeof f.includeOil==='boolean')&&
     Number.isFinite(getValue(f.weight))&&getValue(f.weight)>0&&getValue(f.weight)<=1e9;
   const setNotice=(text,isError=false)=>{
     notice=text;
@@ -77,6 +79,13 @@
     return Number.isNaN(date.valueOf())?'Data desconhecida':date.toLocaleDateString('pt-BR');
   };
   function applyForm(f){
+    // As receitas anteriores nao tinham oleo: aplicar compatibilidade sem oleo.
+    // Disparar "change" notifica tanto a Receita quanto a Precificacao e os Moldes.
+    const oil=$('includeOil');
+    if(oil){
+      oil.checked=f.includeOil===true;
+      oil.dispatchEvent(new Event('change',{bubbles:true}));
+    }
     const tab=$(f.mode==='final'?'tabFinal':'tabBase');
     tab.click();
     $('weight').value=f.weight;
@@ -103,7 +112,8 @@
       const txt=el('div','atelier-item-content');
       txt.append(el('strong','',recipe.name),
         el('small','','Salva em '+formatDate(recipe.createdAt)+' · '+
-          recipe.form.weight+' g '+(recipe.form.mode==='final'?'finais estimados':'de base')));
+          recipe.form.weight+' g '+(recipe.form.mode==='final'?'finais estimados':'de base')+
+          (recipe.form.includeOil===true?' · com óleo vegetal':' · sem óleo vegetal')));
       const buttons=el('div','atelier-item-actions');
       const load=el('button','atelier-primary','Usar receita');load.type='button';
       load.addEventListener('click',()=>{
