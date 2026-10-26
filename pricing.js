@@ -172,7 +172,9 @@
     packageUnitWrap.append(packSelect);
     packageRow.append(amountWrap,packageUnitWrap);
     fields.append(packageRow);
-    fields.append(makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00'));
+    const priceInput=makeInput('Preço pago (R$)',p.price,value=>{p.price=value;store();calculate();},'Ex.: 25,00');
+    priceInput.querySelector('input').dataset.role='purchase-price';
+    fields.append(priceInput);
     {
       const useRow=make('div','p-usage-row');
       const useAmount=makeInput('Quantidade utilizada no lote',
@@ -234,6 +236,10 @@
     const perPurchase=make('span','p-cost-unit-source','Valor por '+p.unit+': —');
     perPurchase.dataset.role='purchase-unit';
     usage.append(uses,perPurchase,cost);row.append(usage);
+    const issue=make('p','p-product-issue','');
+    issue.dataset.role='issue';
+    issue.hidden=true;
+    row.append(issue);
     return row;
   }
   function renderRows(){
@@ -272,20 +278,54 @@
     // Convert L -> mL and kg -> g, without mixing mass and volume.
     return value*(unit==='L'||unit==='kg'?1000:1);
   }
+  // An untouched optional row should not block a finished recipe.
+  // It remains saved so the artisan can continue filling it in later.
+  const emptyDraft=p=>p.type==='custom' &&
+    ['name','pack','price','used'].every(key=>!String(p[key]??'').trim());
+  function itemCheck(p,base){
+    if(emptyDraft(p))return {ignored:true,valid:false,reason:'',field:null,
+      used:NaN,qty:NaN,price:NaN,cost:NaN,purchaseUnit:NaN};
+    const used=usedAmount(p,base),qty=packageAmount(p),price=numeric(p.price);
+    const suspicious=positive(qty)&&qty<=1&&used>qty&&p.unit!=='un';
+    let reason='',field=null;
+    if(!p.name.trim()){reason='Informe o nome do ingrediente.';field='.p-name';}
+    else if(!positive(qty)){reason='Informe a quantidade comprada e confira a unidade da embalagem.';field='[data-role="pack-quantity"]';}
+    else if(!nonNegative(price)){reason='Informe o preço pago pela embalagem.';field='[data-role="purchase-price"]';}
+    else if(!nonNegative(used)){reason='Informe a quantidade utilizada neste lote.';field='[data-role="used-quantity"]';}
+    else if(suspicious){reason='Confira mL ou L: a embalagem parece muito pequena para o consumo informado.';field='[data-role="package-unit"]';}
+    const valid=!reason;
+    return {ignored:false,valid,reason,field,used,qty,price,
+      cost:valid?used*price/qty:NaN,
+      purchaseUnit:positive(qty)&&nonNegative(price)&&!suspicious?price/qty:NaN};
+  }
   function calculate(){
     const {base, estimatedFinal}=formula();
     const n=numeric(state.units), markup=numeric(state.markup);
     const validUnits=Number.isInteger(n)&&n>0&&n<=10000000;
     const validMarkup=nonNegative(markup)&&markup<=100000;
-    let subtotal=0,known=0;
+    let subtotal=0,known=0,ignored=0;
     const missing=[];
+    let firstProblem=null;
     const rows=new Map(Array.from(byId('p_products').children).map(row=>[row.dataset.id,row]));
     const breakdown=byId('p_breakdown_rows');
     const breakdownItems=[];
 
     state.products.forEach(p=>{
-      const used=usedAmount(p,base), qty=packageAmount(p), price=numeric(p.price);
+      const check=itemCheck(p,base);
+      const {used,cost,purchaseUnit}=check;
       const row=rows.get(p.id);
+      if(check.ignored)ignored++;
+      if(row){
+        row.classList.toggle('p-incomplete',!check.valid&&!check.ignored);
+        row.classList.toggle('p-draft',check.ignored);
+        const issue=row.querySelector('[data-role="issue"]');
+        if(issue){
+          issue.hidden=check.valid;
+          issue.textContent=check.ignored?
+            'Rascunho vazio: não entra no custo até você começar a preenchê-lo.':
+            check.reason;
+        }
+      }
       if(row){
         const usage=row.querySelector('[data-role="usage"]');
         if(usage)usage.textContent='Uso no lote: '+measure(used,p.unit);
@@ -299,13 +339,7 @@
             'Quantidade informada manualmente; use Restaurar para voltar à receita.';
         }
       }
-      // Uma embalagem de 1 mL para 14,56 mL consumidos costuma indicar
-      // que "1 litro" foi digitado como "1 mL". Nao distorcer precos.
-      const suspicious=positive(qty)&&qty<=1&&used>qty&&p.unit!=='un';
-      const validProduct=positive(qty)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0&&!suspicious;
-      const cost=validProduct?used*price/qty:NaN;
-      const purchaseUnit=positive(qty)&&nonNegative(price)&&!suspicious?price/qty:NaN;
-      const individual=validProduct&&validUnits?cost/n:NaN;
+      const individual=check.valid&&validUnits?cost/n:NaN;
       if(row){
         const label=row.querySelector('[data-role="cost"]');
         if(label)label.textContent='Custo do lote: '+money(cost);
@@ -313,7 +347,9 @@
         if(purchase)purchase.textContent='Preço por '+p.unit+': '+(Number.isFinite(purchaseUnit)?
           moneyPrecise(purchaseUnit)+'/'+p.unit:'—');
       }
+      if(check.ignored)return;
       const item=make('article','p-breakdown-item');
+      item.classList.toggle('p-breakdown-pending',!check.valid);
       const head=make('div','p-breakdown-item-head');
       head.append(make('strong','',p.name.trim()||'Novo ingrediente'),
         make('span','', 'Usado no lote: '+measure(used,p.unit)));
@@ -327,17 +363,19 @@
         make('strong','',money(cost)));
       cols.append(perPiece,perLot);
       item.append(cols);
+      if(!check.valid)item.append(make('p','p-breakdown-issue',check.reason));
       breakdownItems.push(item);
-      if(validProduct){
+      if(check.valid){
         subtotal+=cost;
         known++;
       } else {
-        missing.push(suspicious?(p.name.trim()||'Matéria-prima')+' (unidade da embalagem precisa de conferência)':(p.name.trim()||'matéria-prima sem nome'));
+        missing.push((p.name.trim()||'Ingrediente adicional')+': '+check.reason);
+        if(!firstProblem)firstProblem={id:p.id,field:check.field,name:p.name.trim()||'Ingrediente adicional'};
       }
     });
     breakdown.replaceChildren(...breakdownItems);
     const usable=positive(base)&&validUnits&&known>0;
-    const complete=usable&&missing.length===0;
+    const complete=usable&&validMarkup&&missing.length===0;
     const unitCost=usable?subtotal/n:NaN;
     const unitSaleRaw=usable&&validMarkup?unitCost*(1+markup/100):NaN;
     // Venda e faturamento devem usar o mesmo valor unitario cobrado em centavos.
@@ -349,6 +387,8 @@
     output('p_sale_price',complete?money(unitSale):'—');
     output('p_cost_unit',money(unitCost));
     output('p_batch_total',usable?money(subtotal):'—');
+    output('p_cost_unit_label',missing.length?'Custos conhecidos por unidade (parcial)':'Custo dos ingredientes por unidade');
+    output('p_batch_total_label',missing.length?'Custos conhecidos no lote (parcial)':'Custo dos ingredientes do lote');
     output('p_breakdown_unit_total',money(unitCost));
     output('p_breakdown_lot_total',usable?money(subtotal):'—');
     output('p_total_sale',complete?money(Number.isFinite(unitSale)&&validUnits?unitSale*n:NaN):'—');
@@ -362,7 +402,7 @@
     output('p_price_explainer',!usable?'Informe o peso e a quantidade de sabonetes para calcular.':
       !validMarkup?'Informe um percentual de acréscimo válido.':
       complete?'Valor por unidade, usando os custos cadastrados e '+NUM.format(markup)+'% de acréscimo. Não inclui despesas indiretas detalhadas.':
-      'Cadastre as quantidades e os preços de todos os ingredientes para calcular o preço final. '+known+' de '+state.products.length+' itens completos.');
+      'Preço indisponível: '+known+' de '+(state.products.length-ignored)+' ingredientes ativos completos. '+missing.join(' ') );
     output('markup-note',validMarkup?
       NUM.format(markup)+'% de acréscimo sobre o custo = custo x '+NUM.format(1+markup/100)+
       '. Este acréscimo não é uma margem de lucro de '+NUM.format(markup)+'% sobre a venda.':
@@ -376,9 +416,31 @@
     if(!validMarkup)issues.push('Informe um percentual de acréscimo válido.');
     if(missing.length)issues.push('Complete antes de precificar: '+missing.join(', ')+'.');
     const status=byId('p_status');
-    status.textContent=issues.join(' ');
+    status.textContent=issues.join(' ')+(ignored?' '+ignored+' rascunho(s) vazio(s) ignorado(s).':'');
     status.hidden=issues.length===0;
-
+    const pending=byId('p_pending');
+    if(pending){
+      pending.hidden=missing.length===0;
+      output('p_pending_title',missing.length?
+        missing.length+' ingrediente(s) precisam de atenção':'');
+      output('p_pending_text',missing.join(' '));
+    }
+    const jump=byId('p_pending_fix');
+    if(jump){
+      jump.hidden=missing.length===0;
+      jump.onclick=()=>{
+        if(!firstProblem)return;
+        window.location.hash='ingredientes';
+        // Navegacao entre os menus acontece na alteracao de hash.
+        window.setTimeout(()=>{
+          const target=Array.from(byId('p_products').children).find(e=>e.dataset.id===firstProblem.id);
+          if(!target)return;
+          target.scrollIntoView({block:'center',behavior:'smooth'});
+          const focus=target.querySelector(firstProblem.field||'.p-name');
+          if(focus)focus.focus({preventScroll:true});
+        },30);
+      };
+    }
   }
   load();
   Object.keys(formFields).forEach(id=>{
@@ -407,16 +469,18 @@
     const units=numeric(state.units),markup=numeric(state.markup);
     const validUnits=Number.isInteger(units)&&units>0&&units<=1e7;
     const validMarkup=nonNegative(markup)&&markup<=1e5;
-    let total=0,validCount=0;
-    const lines=state.products.map(p=>{
-      const used=usedAmount(p,base),pack=packageAmount(p),price=numeric(p.price);
-      const suspicious=positive(pack)&&pack<=1&&used>pack&&p.unit!=='un';
-      const valid=positive(pack)&&nonNegative(price)&&nonNegative(used)&&p.name.trim().length>0&&!suspicious;
-      const cost=valid?used*price/pack:null;
-      if(valid){total+=cost;validCount++;}
-      return {name:p.name,used:Number.isFinite(used)?used:null,unit:p.unit,cost};
+    let total=0,validCount=0,ignored=0;
+    const lines=[];
+    state.products.forEach(p=>{
+      const check=itemCheck(p,base);
+      if(check.ignored){ignored++;return;}
+      const cost=check.valid?check.cost:null;
+      if(check.valid){total+=cost;validCount++;}
+      lines.push({name:p.name,used:Number.isFinite(check.used)?check.used:null,unit:p.unit,cost,
+        issue:check.valid?null:check.reason});
     });
-    const complete=positive(base)&&validUnits&&validMarkup&&validCount===state.products.length;
+    const complete=positive(base)&&validUnits&&validMarkup&&
+      validCount===state.products.length-ignored;
     const roundedPrice=complete?Math.round((total/units*(1+markup/100)+Number.EPSILON)*100)/100:null;
     return {
       complete,base:Number.isFinite(base)?base:null,
