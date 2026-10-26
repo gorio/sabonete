@@ -244,7 +244,7 @@
         </section>
         <section class="mold-panel" aria-labelledby="moldOutputTitle">
           <h3 id="moldOutputTitle">Materiais estimados para o lote</h3>
-          <p>Prévia matemática com a proporção atual da calculadora: por 100 g de base, 8 mL de essência, 7 mL de extrato e 10 mL de lauril.</p>
+          <p>Prévia matemática por 100 g de base: 8 mL de essência, 7 mL de extrato e 10 mL de lauril. Se o óleo estiver ativado na aba Receita, serão adicionados 2,5 mL de óleo vegetal.</p>
           <div class="mold-results">
             <div class="mold-stat"><small>Sabonetes previstos</small><strong id="moldTotalUnits">—</strong></div>
             <div class="mold-stat"><small>Peso final total, com reserva</small><strong id="moldFinishedMass">—</strong></div>
@@ -252,6 +252,7 @@
             <div class="mold-stat"><small>Essência</small><strong id="moldEssence">—</strong></div>
             <div class="mold-stat"><small>Extrato glicólico</small><strong id="moldExtract">—</strong></div>
             <div class="mold-stat"><small>Lauril</small><strong id="moldLauril">—</strong></div>
+            <div class="mold-stat"><small>Óleo vegetal (opcional)</small><strong id="moldOil">—</strong></div>
           </div>
           <p id="moldSummary" class="mold-summary" aria-live="polite"></p>
           <div class="mold-saved-header"><h3>Meus moldes</h3><small id="moldLibraryCount">0 de 25 moldes</small></div>
@@ -264,7 +265,7 @@
 
     <section class="card pricing-card module-screen" id="ingredientes" data-screen="ingredientes" aria-labelledby="ingredients-title">
       <h2 id="ingredients-title">Cadastro de matérias-primas</h2>
-      <p class="pricing-lead">Organize aqui os produtos comprados e as quantidades utilizadas. O custo fica disponível automaticamente no menu de venda.</p>
+      <p class="pricing-lead">Organize aqui os produtos comprados e as quantidades utilizadas. O óleo vegetal opcional só participa da precificação quando for ativado na aba Receita.</p>
 
       <div class="p-step-heading">
         <span class="p-step-number">1</span>
@@ -273,7 +274,7 @@
       </div>
       <div id="p_products" class="p-products" aria-label="Ingredientes, quantidades e preços"></div>
       <button id="p_add" class="p-add p-add-main" type="button">+ Adicionar ingrediente ou produto</button>
-      <p class="p-materials-description">Exemplos: corante, outra essência ou óleo vegetal. Aceitamos g, kg, mL, L e unidades. O consumo dos quatro ingredientes iniciais é sugerido pela receita e pode ser ajustado ou restaurado.</p>
+      <p class="p-materials-description">Exemplos de adicionais: corante, outra essência ou outros ativos. Aceitamos g, kg, mL, L e unidades. Os cinco ingredientes principais, incluindo o óleo vegetal opcional, têm consumo sugerido pela receita, que pode ser ajustado ou restaurado. O óleo só é cobrado quando estiver ativado.</p>
       <p id="p_status" class="pricing-status" role="status">Preencha o que estiver faltando para concluir a precificação.</p>
     </section>
 
@@ -341,7 +342,7 @@
           <div><span>Ingredientes no lote</span><strong id="p_breakdown_lot_total">—</strong></div>
         </div>
       </div>
-      <p class="pricing-assumptions">A estimativa usa a receita original e a quantidade produzida. Quantidades alteradas manualmente e insumos extras entram na conta financeira, mas não alteram o peso final teórico sem dados de densidade. O acréscimo não equivale a lucro líquido: despesas indiretas não estão detalhadas.</p>
+      <p class="pricing-assumptions">A estimativa usa a receita com os ingredientes ativos (óleo vegetal opcional quando marcado) e a quantidade produzida. Quantidades alteradas manualmente e insumos extras entram na conta financeira, mas não alteram o peso final teórico sem dados de densidade. O acréscimo não equivale a lucro líquido: despesas indiretas não estão detalhadas.</p>
       <p class="p-notice">A fórmula 8/7/10 reproduz as proporções informadas, mas não é uma validação técnica para uso ou venda. Verifique a capacidade da base, o limite IFRA categoria 9 da fragrância e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
       <p class="pricing-assumptions" id="build-version">Calculadora de venda · revisão 26.10.2026-1</p>
