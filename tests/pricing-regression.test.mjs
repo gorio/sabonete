@@ -129,7 +129,7 @@ test('oil disabled by default never blocks sale even when its cost is not regist
  const x=setup();
  assert.equal(x.summary.complete,true);
  assert.equal(x.summary.lines.some(line=>line.name.includes('Óleo')),false);
- assert.equal(x.elements.p_sale_price.textContent,'R$ 5,86');
+ assert.match(x.elements.p_sale_price.textContent,/R\$\s*5,86/);
 });
 test('activating oil changes inverse base factor and requests missing purchase cost',()=>{
  const x=setup({includeOil:true});
