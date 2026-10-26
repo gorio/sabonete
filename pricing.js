@@ -328,7 +328,7 @@
       }
       if(row){
         const usage=row.querySelector('[data-role="usage"]');
-        if(usage)usage.textContent='Uso no lote: '+measure(used,p.unit);
+        if(usage)usage.textContent=check.ignored?'Rascunho ainda não utilizado':'Uso no lote: '+measure(used,p.unit);
         if(p.type!=='custom'){
           const field=row.querySelector('[data-role="used-quantity"]');
           if(field && p.used==='' && document.activeElement!==field)
@@ -342,7 +342,7 @@
       const individual=check.valid&&validUnits?cost/n:NaN;
       if(row){
         const label=row.querySelector('[data-role="cost"]');
-        if(label)label.textContent='Custo do lote: '+money(cost);
+        if(label)label.textContent=check.ignored?'Fora do cálculo':'Custo do lote: '+money(cost);
         const purchase=row.querySelector('[data-role="purchase-unit"]');
         if(purchase)purchase.textContent='Preço por '+p.unit+': '+(Number.isFinite(purchaseUnit)?
           moneyPrecise(purchaseUnit)+'/'+p.unit:'—');
@@ -410,6 +410,10 @@
     output('p_recipe_batch',Number.isFinite(base)?
       'Receita: '+measure(base,'g')+' de base; lote de '+measure(estimatedFinal,'g')+' estimados.':
       'Informe um peso válido na calculadora principal.');
+    output('p_units_hint',!validUnits?
+      'Informe quantos sabonetes este lote realmente rende. Um peso em gramas não é uma quantidade de unidades.':
+      n===1?'Rendimento informado: 1 sabonete. O custo por unidade coincide com o custo total do lote.':
+      'Rendimento informado: '+n+' sabonetes. O custo do lote será dividido por '+n+' unidades.');
     const issues=[];
     if(!positive(base))issues.push('Informe o peso na calculadora de ingredientes.');
     if(!validUnits)issues.push('Informe o rendimento em unidades inteiras maiores que zero.');
