@@ -10,7 +10,7 @@ class Element {
     this.tagName=tag;this.id=id;this.children=[];this.dataset={};
     this.attrs={};this.listeners={};this.style={};this.className='';
     this.textContent='';this.value='';this.hidden=false;this.disabled=false;
-    this.open=false;
+    this.open=false;this.checked=false;
     this.classList={toggle:(name,value)=>{this.attrs['class:'+name]=value}};
   }
   append(...items){this.children.push(...items);for(const e of items)if(e instanceof Element)e.parent=this}
@@ -35,7 +35,7 @@ const ids=('venda p_products p_add p_units p_markup_input p_sale_price p_hero p_
  'p_batch_total p_breakdown_rows p_breakdown_unit_total p_breakdown_lot_total p_total_sale '+
  'p_units_copy p_lot_sale p_total_sale_label p_total_sale_note p_price_explainer p_recipe_batch '+
  'p_unit_weight markup-note p_status p_pending p_pending_title p_pending_text p_pending_fix '+
- 'p_cost_unit_label p_batch_total_label p_units_hint weight tabBase tabFinal').split(' ');
+ 'p_cost_unit_label p_batch_total_label p_units_hint weight tabBase tabFinal includeOil').split(' ');
 const products=[
 {id:'base',type:'base',name:'Base vegetal',unit:'g',pack:'3000',price:'78,89',used:''},
 {id:'ess',type:'ess',name:'Essência',unit:'mL',pack:'100',price:'26,60',used:''},
@@ -45,11 +45,16 @@ const products=[
 const copy=o=>JSON.parse(JSON.stringify(o));
 const extra=(fields={})=>({id:'extra-1',type:'custom',name:'',unit:'mL',
 pack:'',packUnit:'mL',price:'',used:'',usedUnit:'mL',...fields});
-function setup({custom=null,markup='150',units='1',extractPack='100'}={}){
+function setup({custom=null,markup='150',units='1',extractPack='100',includeOil=false,oilPrice='',oilPack=''}={}){
  const elements=Object.fromEntries(ids.map(id=>[id,new Element('div',id)]));
  elements.weight.value='50';
  elements.tabFinal.attrs['aria-pressed']='true';
- const list=copy(products);list[2].pack=extractPack;if(custom!==null)list.push(extra(custom));
+ elements.includeOil.checked=includeOil;
+ const list=copy(products);list[2].pack=extractPack;
+ if(includeOil){
+   list.push({id:'oil',type:'oil',name:'Óleo vegetal (opcional)',unit:'mL',pack:oilPack,price:oilPrice,used:''});
+ }
+ if(custom!==null)list.push(extra(custom));
  const draft={products:list,units,markup,next:custom!==null?2:1};
  const localStorage={
    data:{'sabonete-precos-v2':JSON.stringify(draft)},
@@ -109,7 +114,7 @@ test('fix button takes artisan to the missing ingredient and focuses the failing
  const {elements:e,window}=setup({custom:{name:'Corante'}});
  e.p_pending_fix.click();
  assert.equal(window.location.hash,'ingredientes');
- assert.equal(e.p_products.children[4].querySelector('[data-role="pack-quantity"]').focused,true);
+ assert.equal(e.p_products.children.find(row=>row.dataset.id==='extra-1').querySelector('[data-role="pack-quantity"]').focused,true);
 });
 test('unit conversion and saved markup do not alter existing prices unexpectedly',()=>{
  const x=setup({units:'20'});
@@ -118,4 +123,36 @@ test('unit conversion and saved markup do not alter existing prices unexpectedly
  assert.equal(x.summary.lines.length,4);
  assert.equal(x.summary.batchCost>0,true);
  assert.equal(x.elements.p_pending.hidden,true);
+});
+
+test('oil disabled by default never blocks sale even when its cost is not registered',()=>{
+ const x=setup();
+ assert.equal(x.summary.complete,true);
+ assert.equal(x.summary.lines.some(line=>line.name.includes('Óleo')),false);
+ assert.equal(x.elements.p_sale_price.textContent,'R$ 5,86');
+});
+test('activating oil changes inverse base factor and requests missing purchase cost',()=>{
+ const x=setup({includeOil:true});
+ assert.equal(x.summary.complete,false);
+ assert.equal(x.elements.p_sale_price.textContent,'—');
+ assert.match(x.elements.p_pending_text.textContent,/Óleo vegetal.*quantidade comprada/);
+ assert.equal(Math.abs(x.summary.base-50/1.275)<1e-8,true);
+});
+test('oil with cost contributes precisely 2.5 mL per 100 g of base',()=>{
+ const x=setup({includeOil:true,oilPack:'100',oilPrice:'20'});
+ assert.equal(x.summary.complete,true);
+ const oil=x.summary.lines.find(l=>l.name.includes('Óleo'));
+ assert.equal(Math.abs(oil.used-x.summary.base*.025)<1e-8,true);
+ assert.equal(Math.abs(oil.cost-oil.used*.2)<1e-8,true);
+ assert.match(x.elements.p_sale_price.textContent,/R\$/);
+});
+test('activating oil after loading re-renders price; deactivating returns baseline',()=>{
+ const x=setup();
+ const first=x.elements.p_sale_price.textContent;
+ x.elements.includeOil.checked=true;
+ x.elements.includeOil.fire('change');
+ assert.equal(x.elements.p_sale_price.textContent,'—');
+ x.elements.includeOil.checked=false;
+ x.elements.includeOil.fire('change');
+ assert.equal(x.elements.p_sale_price.textContent,first);
 });
