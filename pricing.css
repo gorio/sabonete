@@ -139,3 +139,20 @@
  .p-step-heading{gap:8px}
  .p-step-heading h3{font-size:16px}
 }
+
+/* Causas claras para preço pendente, sem inventar custo final */
+.p-pending-summary{margin:13px 0 16px;border:1px solid #edce9d;border-radius:13px;background:#fff9f0;padding:15px 17px;color:#865521}
+.p-pending-summary[hidden]{display:none}
+.p-pending-summary strong{display:block;font-size:14px;font-weight:850;line-height:1.4}
+.p-pending-summary p{margin:8px 0 12px;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.p-pending-summary button{border:1px solid #b8772f;background:#fff;color:#855019;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;padding:10px 13px}
+.p-pending-summary button:hover{background:#fff3df}
+.p-pending-summary button:focus-visible{outline:3px solid #dea866;outline-offset:2px}
+.p-product-row.p-incomplete{border-color:#dba75c;background:#fffaf1}
+.p-product-issue{font-size:12px;font-weight:700;color:#865521;background:#fff1d7;border-radius:8px;padding:9px 11px;margin:10px 0 0;line-height:1.45}
+.p-product-issue[hidden]{display:none}
+.p-product-row.p-draft{border-style:dashed;background:#f7faf7}
+.p-product-row.p-draft .p-product-issue{background:#edf4ef;color:#607365}
+.p-breakdown-item.p-breakdown-pending{border-color:#e2bb87;background:#fffaf3}
+.p-breakdown-issue{color:#855521;font-size:11px;margin:10px 0 0;line-height:1.45}
+.p-yield-help{margin-top:1px}
