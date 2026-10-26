@@ -288,11 +288,17 @@
       </div>
       <p class="pricing-help" id="markup-note">150% de acréscimo sobre o custo = multiplicar por 2,5.</p>
       <p class="pricing-help" id="p_recipe_batch">Receita calculada acima.</p>
+      <p class="pricing-help p-yield-help" id="p_units_hint">O rendimento deve ser informado em quantidade de sabonetes, não em gramas.</p>
 
       <div class="p-step-heading p-step-divider">
         <span class="p-step-number">2</span>
         <div><h3>Resultado da precificação</h3>
         <p class="pricing-help">Os valores de venda só são liberados após o preenchimento de todos os ingredientes.</p></div>
+      </div>
+      <div class="p-pending-summary" id="p_pending" role="status" aria-live="polite" hidden>
+        <strong id="p_pending_title">Ingredientes pendentes</strong>
+        <p id="p_pending_text">Informe os dados que faltam para concluir o preço.</p>
+        <button type="button" id="p_pending_fix">Corrigir ingrediente pendente</button>
       </div>
       <div class="p-sale-hero incomplete" id="p_hero" aria-live="polite">
         <span class="p-sale-title" id="p_sale_label">Preço sugerido por sabonete</span>
@@ -306,11 +312,11 @@
       </div>
       <div class="p-simple-info">
         <div class="p-simple-item">
-          <span>Custo dos ingredientes por unidade</span>
+          <span id="p_cost_unit_label">Custo dos ingredientes por unidade</span>
           <strong id="p_cost_unit">—</strong>
         </div>
         <div class="p-simple-item">
-          <span>Custo dos ingredientes do lote</span>
+          <span id="p_batch_total_label">Custo dos ingredientes do lote</span>
           <strong id="p_batch_total">—</strong>
         </div>
       </div>
@@ -318,7 +324,7 @@
 
       <div class="p-breakdown" aria-labelledby="p_breakdown_title">
         <h3 id="p_breakdown_title">Detalhamento dos custos</h3>
-        <p class="p-breakdown-caption">Custo de cada ingrediente por sabonete e no lote inteiro. Valores pendentes aparecem com traço.</p>
+        <p class="p-breakdown-caption">Custo de cada ingrediente por sabonete e no lote inteiro. Itens adicionais completamente vazios são apenas rascunhos e não bloqueiam o cálculo. Valores pendentes apresentam o motivo e não são somados ao total.</p>
         <div id="p_breakdown_rows" class="p-breakdown-list"></div>
         <div class="p-breakdown-totals">
           <div><span>Ingredientes por sabonete</span><strong id="p_breakdown_unit_total">—</strong></div>
@@ -328,7 +334,7 @@
       <p class="pricing-assumptions">A estimativa usa a receita original e a quantidade produzida. Quantidades alteradas manualmente e insumos extras entram na conta financeira, mas não alteram o peso final teórico sem dados de densidade. O acréscimo não equivale a lucro líquido: despesas indiretas não estão detalhadas.</p>
       <p class="p-notice">A fórmula 8/7/10 reproduz as proporções informadas, mas não é uma validação técnica para uso ou venda. Verifique a capacidade da base, o limite IFRA categoria 9 da fragrância e a compatibilidade do lauril.</p>
       <p class="pricing-assumptions">Os valores ficam salvos neste navegador, sem sincronização entre dispositivos.</p>
-      <p class="pricing-assumptions" id="build-version">Calculadora de venda · versão 25.10.2026-8</p>
+      <p class="pricing-assumptions" id="build-version">Calculadora de venda · revisão 26.10.2026-1</p>
     </section>
 
 
@@ -565,7 +571,7 @@
     })();
   </script>
   <script src="palette.js" defer></script>
-  <script src="pricing.js?v=1eb7118b96ee4bc6e84e57335af584203e2b00d9" defer></script>
+  <script src="pricing.js?v=9da77550099622214854cdaf7ab353957496282c" defer></script>
   <script src="training.js?v=fa546fdf4a62b6e21e9ae0335528539853ffe056" defer></script>
   <script src="molds.js?v=70912b055e05e2a35848627e775e67460fb4b746" defer></script>
   <script src="atelier.js?v=95bcbf71a000e398125e59b867ace14289ce1267" defer></script>
